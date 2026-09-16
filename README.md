@@ -41,10 +41,11 @@ assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (all `C
 
 Every layer's display name has `MNLCCv1-0_16SEP2026` appended (product version tag).
 
-All 7 raw layers are automatically masked to exclude USGS NLCD 2021 open water and
-developed/impervious land (fully transparent, not a solid color) — this is unconditional, not a
-toggle. `peat_extent_mask` and `water_mask` above are separate opt-in reference overlays for
-showing predicted extent / water boundaries explicitly.
+All 7 raw layers are automatically masked to exclude USGS NLCD 2021 open water,
+developed/impervious land, and barren/extractive land (strip mines, gravel pits, quarries — e.g.
+the Mesabi Iron Range open pits), fully transparent rather than a solid color. This is
+unconditional, not a toggle. `peat_extent_mask` and `water_mask` above are separate opt-in
+reference overlays for showing predicted extent / water boundaries explicitly.
 
 Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from his trial GEE
 scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
@@ -135,11 +136,11 @@ be added by editing `backend/layers.json`, without changing frontend code.
 ## Layer Configuration
 
 Map layers are configured in `backend/layers.json`. Three layer types are supported: `gee_image`
-(a direct Earth Engine image asset — automatically masked to exclude NLCD open water and
-developed/impervious land, plus nodata masking, valid min/max masking, value scaling/offset, and
-self-masking), `threshold_binary` (binarizes another configured layer), and `nlcd_water` (a
-standalone open-water reference layer, unaffected by the auto-masking). See
-`docs/architecture.md` for details.
+(a direct Earth Engine image asset — automatically masked to exclude NLCD open water,
+developed/impervious land, and barren/extractive land, plus nodata masking, valid min/max
+masking, value scaling/offset, and self-masking), `threshold_binary` (binarizes another
+configured layer), and `nlcd_water` (a standalone open-water reference layer, unaffected by the
+auto-masking). See `docs/architecture.md` for details.
 
 ## Deployment
 

@@ -132,15 +132,18 @@ percentages, depth, carbon stock) are single-band ingested assets under
 `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/`, all using this type.
 
 Every `gee_image` layer is **automatically masked** to exclude USGS NLCD 2021 open water (class
-11) and developed/impervious land (classes 21-24, Open Space through High Intensity) —
-`_apply_common_transforms()` in `backend/layers.py` applies `_nlcd_exclusion_mask()`
+11), developed/impervious land (classes 21-24, Open Space through High Intensity), and barren
+land (class 31 — includes strip mines, gravel pits, and quarries, e.g. the Mesabi Iron Range open
+pits) — `_apply_common_transforms()` in `backend/layers.py` applies `_nlcd_exclusion_mask()`
 unconditionally, before any other transform. Masked pixels render fully transparent (not a solid
 color), so basemap/imagery shows through. This is unconditional for every `gee_image` layer; there
-is currently no per-layer opt-out.
+is currently no per-layer opt-out. Note class 31 also covers non-mining barren land (natural rock
+outcrops, beaches); NLCD has no separate "extractive" class, so this is the standard tradeoff for
+masking mining areas.
 
 Supported transformations (`_apply_common_transforms` in `backend/layers.py`):
 
-- NLCD water + developed exclusion (see above; always applied)
+- NLCD water + developed + barren/extractive exclusion (see above; always applied)
 - `nodata_value` — exact-value mask (255 for the uint8 layers, 65535 for the uint16 layers)
 - `valid_min` / `valid_max` — inequality mask
 - `value_multiplier` / `value_offset` — rescale raw stored values to public units

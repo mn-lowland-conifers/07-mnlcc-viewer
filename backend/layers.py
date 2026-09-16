@@ -6,15 +6,19 @@ import ee
 
 LAYER_FILE = Path(__file__).parent / "layers.json"
 
-# Used to auto-mask every gee_image layer (open water + developed/impervious),
-# by threshold_binary layers with "exclude_nlcd_water": true, and by the
-# "nlcd_water" layer type.
+# Used to auto-mask every gee_image layer (open water + developed/impervious +
+# barren/extractive), by threshold_binary layers with "exclude_nlcd_water":
+# true, and by the "nlcd_water" layer type.
 NLCD_COLLECTION = "USGS/NLCD_RELEASES/2021_REL/NLCD"
 NLCD_YEAR = "2021"
 NLCD_WATER_CLASS = 11
 # Developed, Open Space / Low / Medium / High Intensity.
 NLCD_DEVELOPED_CLASSES = [21, 22, 23, 24]
-NLCD_EXCLUDED_CLASSES = [NLCD_WATER_CLASS] + NLCD_DEVELOPED_CLASSES
+# Barren Land (Rock/Sand/Clay) - includes strip mines, gravel pits, quarries.
+NLCD_BARREN_CLASS = 31
+NLCD_EXCLUDED_CLASSES = (
+    [NLCD_WATER_CLASS] + NLCD_DEVELOPED_CLASSES + [NLCD_BARREN_CLASS]
+)
 
 
 def load_layers():
