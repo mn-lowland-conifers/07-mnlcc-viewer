@@ -1,0 +1,446 @@
+{
+  "pf_prob_aksdb_v2": {
+    "enabled": false,
+    "name": "PF Prob — AKSDB v1-2 RF-RFE",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp002_pf_prob8_statewide_v20260628",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "value_offset": 0,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
+      ]
+    }
+  },
+
+  "peat_prob_aksdb_v2": {
+    "enabled": false,
+    "name": "Peat Prob — AKSDB v1-2 RF-RFE",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp005_peat_prob8_statewide_v20260628",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "value_offset": 0,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "f5f0e8", "c9a96e", "8b6530", "6b4514", "3d2209"
+      ]
+    }
+  },
+
+  "pf_binary_aksdb_v2": {
+    "enabled": false,
+    "name": "PF Binary — AKSDB v1-2 ≥31%",
+    "type": "threshold_binary",
+    "source_layer": "pf_prob_aksdb_v2",
+    "threshold": 31,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["1565c0"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "1565c0"}
+    ]
+  },
+
+  "peat_binary_aksdb_v2": {
+    "enabled": false,
+    "name": "Peat Binary — AKSDB v1-2 ≥27%",
+    "type": "threshold_binary",
+    "source_layer": "peat_prob_aksdb_v2",
+    "threshold": 27,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["3d2209"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "3d2209"}
+    ]
+  },
+
+  "peat_pf_combo_aksdb_v2": {
+    "enabled": false,
+    "name": "Peat + PF Combo — AKSDB v1-2",
+    "type": "peat_pf_combo",
+    "peat_binary_layer": "peat_binary_aksdb_v2",
+    "pf_binary_layer": "pf_binary_aksdb_v2",
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 2,
+      "palette": ["8b2fc9", "ADD8E6"]
+    },
+    "classes": [
+      {"value": 1, "label": "Peat present, no permafrost", "color": "8b2fc9"},
+      {"value": 2, "label": "Peat present + permafrost", "color": "ADD8E6"}
+    ]
+  },
+
+  "soil_order_aksdb_v3": {
+    "enabled": false,
+    "name": "Soil Order — AKSDB v1-3 RF-RFE exp007",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp007_taxorder_argmax_statewide_v20260630",
+    "scale": 30,
+    "unit": "",
+    "nodata_value": 255,
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 6,
+      "palette": [
+        "da2724", "e9db11", "3173cf", "a364eb",
+        "dda729", "989898", "1e8c08"
+      ]
+    },
+    "classes": [
+      {"value": 0, "label": "Andisols", "color": "da2724"},
+      {"value": 1, "label": "Entisols", "color": "e9db11"},
+      {"value": 2, "label": "Gelisols", "color": "3173cf"},
+      {"value": 3, "label": "Histosols", "color": "a364eb"},
+      {"value": 4, "label": "Inceptisols", "color": "dda729"},
+      {"value": 5, "label": "Mollisols", "color": "989898"},
+      {"value": 6, "label": "Spodosols", "color": "1e8c08"}
+    ]
+  },
+
+  "all_peat_prob_aksdb_v4": {
+    "name": "All Peat > 20cm - AKSDB v1-4 GBM-RFE",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp055_peatbin_prob8_statewide_v20260807",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": true,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
+      ]
+    }
+  },
+
+  "all_peat_binary_aksdb_v4": {
+    "name": "All Peat Binary — AKSDB v1-4 ≥35%",
+    "type": "threshold_binary",
+    "source_layer": "all_peat_prob_aksdb_v4",
+    "threshold": 35,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["c9a96e"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "c9a96e"}
+    ]
+  },
+
+  "deep_peat_prob_aksdb_v4": {
+    "name": "Deep Peat > 40cm - AKSDB v1-4 GBM-RFE",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp054_peat_deep_prob8_statewide_v20260807",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
+      ]
+    }
+  },
+
+  "deep_peat_binary_aksdb_v4": {
+    "name": "Deep Peat Binary — AKSDB v1-4 ≥25.5%",
+    "type": "threshold_binary",
+    "source_layer": "deep_peat_prob_aksdb_v4",
+    "threshold": 25.5,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["3d2209"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "3d2209"}
+    ]
+  },
+
+  "gssurgo_deep_peat_pct": {
+    "name": "SSURGO Deep Peat (> 40cm) % of MU",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/gssurgo_pct_statewide_v20260807",
+    "band": "b1",
+    "scale": 30,
+    "unit": "%",
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
+      ]
+    }
+  },
+
+  "pf_prob_aksdb_v4": {
+    "name": "Permafrost < 2m - AKSDB v1-4 CatBoost-RFE",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp070_pfbin_catboost_prob8_statewide_v20260809",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
+      ]
+    }
+  },
+
+  "pf_binary_aksdb_v4": {
+    "name": "Permafrost Binary — AKSDB v1-4 ≥38%",
+    "type": "threshold_binary",
+    "source_layer": "pf_prob_aksdb_v4",
+    "threshold": 38,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["08306b"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "08306b"}
+    ]
+  },
+
+  "soil_order_aksdb_v4": {
+    "name": "Dominant Soil Order - AKSDB v1-4 GBM-RFE",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/exp074_taxorder_gbmmc_argmax_statewide_v20260810",
+    "scale": 30,
+    "unit": "",
+    "nodata_value": 255,
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 6,
+      "palette": [
+        "aa2535", "ffe601", "53b5d0", "802ddf",
+        "ff7f00", "8f8f8f", "33a02c"
+      ]
+    },
+    "classes": [
+      {"value": 0, "label": "Andisols", "color": "aa2535"},
+      {"value": 1, "label": "Entisols", "color": "ffe601"},
+      {"value": 2, "label": "Gelisols", "color": "53b5d0"},
+      {"value": 3, "label": "Histosols", "color": "802ddf"},
+      {"value": 4, "label": "Inceptisols", "color": "ff7f00"},
+      {"value": 5, "label": "Mollisols", "color": "8f8f8f"},
+      {"value": 6, "label": "Spodosols", "color": "33a02c"}
+    ]
+  },
+
+  "gssurgo_dominant_order": {
+    "name": "Dominant Soil Order — SSURGO",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/gssurgo_dominant_order_statewide_v20260811",
+    "scale": 30,
+    "unit": "",
+    "valid_min": 0,
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 6,
+      "palette": [
+        "aa2535", "ffe601", "53b5d0", "802ddf",
+        "ff7f00", "8f8f8f", "33a02c"
+      ]
+    },
+    "classes": [
+      {"value": 0, "label": "Andisols", "color": "aa2535"},
+      {"value": 1, "label": "Entisols", "color": "ffe601"},
+      {"value": 2, "label": "Gelisols", "color": "53b5d0"},
+      {"value": 3, "label": "Histosols", "color": "802ddf"},
+      {"value": 4, "label": "Inceptisols", "color": "ff7f00"},
+      {"value": 5, "label": "Mollisols", "color": "8f8f8f"},
+      {"value": 6, "label": "Spodosols", "color": "33a02c"}
+    ]
+  },
+
+  "pastick_pf_prob": {
+    "name": "PF Prob — Pastick et al. 2015",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/pastick_nspprob_2000to2009",
+    "scale": 30,
+    "unit": "%",
+    "valid_max": 100,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
+      ]
+    }
+  },
+
+  "pastick_pf_binary": {
+    "name": "PF Binary — Pastick et al. 2015 ≥50%",
+    "type": "threshold_binary",
+    "source_layer": "pastick_pf_prob",
+    "threshold": 50,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["1565c0"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "1565c0"}
+    ]
+  },
+
+  "lara_peat_2021": {
+    "name": "Lara et al. 2021 Peat Map",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/lara-et-al-peat-map-2021",
+    "scale": 30,
+    "unit": "",
+    "self_mask": true,
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 2,
+      "palette": ["ff00ff", "ff8c00"]
+    },
+    "classes": [
+      {"value": 1, "label": "Wet peat", "color": "ff00ff"},
+      {"value": 2, "label": "Moist peat", "color": "ff8c00"}
+    ]
+  },
+
+  "soil_extent_mask_v2026": {
+    "name": "Soil-Extent Mask — AKSDB v2026",
+    "type": "soil_extent_mask",
+    "collection": "projects/akveg-map/assets/ak_soil_data_bank/soil_maps_draft_v2026",
+    "mask_metric": "Soil_Mask",
+    "probability_metric": "Dominant_Soil_Order_Probability",
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 5,
+      "palette": [
+        "00000000",
+        "000000",
+        "000000",
+        "0000aa",
+        "ffffff",
+        "0000aa"
+      ]
+    },
+    "classes": [
+      {"value": 1, "label": "Soil mask class 1", "color": "000000"},
+      {"value": 2, "label": "Soil mask class 2", "color": "000000"},
+      {"value": 3, "label": "Soil mask class 3", "color": "0000aa"},
+      {"value": 4, "label": "Soil mask class 4", "color": "ffffff"},
+      {"value": 5, "label": "Soil mask class 5", "color": "0000aa"}
+    ]
+  }
+}

@@ -1,0 +1,96 @@
+// ===================================================================
+// Peat depth viewer GEE (continuous & binned) updated 09/15/2026
+// ===================================================================
+
+// ---- CONFIG ----------------------------------------------------------
+var ASSET_ROOT = '/PATH/';
+
+// uint16, 1:1 scale (pixel value = depth in cm), nodata = 65535
+var DEPTH_NODATA = 65535;
+var depthRaw = ee.Image(ASSET_ROOT + 'depth_uint16_COG');
+var depth = depthRaw.updateMask(depthRaw.neq(DEPTH_NODATA));
+
+// uint8 scale: pixel_value * 0.005 = probability (0-1). LGBM threshold = 0.362.
+var PROB_SCALE = 0.005;
+var PROB_THRESHOLD = 0.362;
+var prob = ee.Image(ASSET_ROOT + 'depth_uint16_COG').multiply(PROB_SCALE);
+var peatMask = prob.gte(PROB_THRESHOLD);
+
+var nlcd = ee.ImageCollection('USGS/NLCD_RELEASES/2021_REL/NLCD')
+  .filter(ee.Filter.eq('system:index', '2021'))
+  .first().select('landcover');
+var waterMask = nlcd.neq(11);
+var finalMask = peatMask.and(waterMask);
+
+// ---- Lava color ramp --------------------------
+var lavaPalette = [
+  '000000', '2b0000', '660000', '990000', 'cc0000',
+  'e63900', 'ff6600', 'ff9900', 'ffcc00', 'ffff99'
+];
+
+// ---- Continuous layer ----------------------------------------------------
+var DEPTH_MAX = 350;
+var visDepthContinuous = {min: 0, max: DEPTH_MAX, palette: lavaPalette};
+
+// ---- Binned / classified layer -------------------------------------------
+// Breaks: 0-50, 50-100, 100-200, 200-300, 300+
+//   1: 0-50      2: 50-100      3: 100-200      4: 200-300      5: 300+
+var depthClass = depth.expression(
+  "(d >= 300) ? 5 : (d >= 200) ? 4 : (d >= 100) ? 3 : (d >= 50) ? 2 : 1",
+  {d: depth}
+).rename('depth_class').toByte();
+
+var binPalette = ['2b0000', '990000', 'ff6600', 'ffcc00', 'ffff99']; // shallow(dark) -> deep(light)
+var visDepthBinned = {min: 1, max: 5, palette: binPalette};
+
+// ---- MAP LAYERS ------------------------------------------------------------
+Map.setCenter(-94.0, 46.5, 7);
+
+Map.addLayer(depth.updateMask(finalMask), visDepthContinuous,
+  'Depth — continuous (cm)', true);
+
+Map.addLayer(depthClass.updateMask(finalMask), visDepthBinned,
+  'Depth — binned', false);
+
+Map.addLayer(nlcd.eq(11).selfMask(), {palette: ['000000']}, 'NLCD Open Water', false);
+
+// ---- LEGENDS ------------------------------------------------------------
+function addGradientLegend(visParams, title) {
+  var lon = ee.Image.pixelLonLat().select('longitude');
+  var gradient = lon.multiply((visParams.max - visParams.min) / 100.0).add(visParams.min);
+  var legendImage = gradient.visualize(visParams);
+
+  var thumb = ui.Thumbnail({
+    image: legendImage,
+    params: {bbox: [0, 0, 100, 10], dimensions: '200x20'},
+    style: {stretch: 'horizontal', margin: '0px 8px'}
+  });
+
+  var minMaxRow = ui.Panel({
+    widgets: [
+      ui.Label(String(visParams.min) + ' cm', {margin: '4px 8px'}),
+      ui.Label('', {stretch: 'horizontal'}),
+      ui.Label(String(visParams.max) + ' cm', {margin: '4px 8px'})
+    ],
+    layout: ui.Panel.Layout.Flow('horizontal')
+  });
+
+  var panel = ui.Panel({
+    widgets: [ui.Label(title, {fontWeight: 'bold'}), thumb, minMaxRow],
+    style: {position: 'bottom-left', padding: '8px 15px'}
+  });
+  Map.add(panel);
+}
+addGradientLegend(visDepthContinuous, 'Peat Depth (cm)');
+
+var binLabels = ['0–50 cm', '50–100 cm', '100–200 cm', '200–300 cm', '300+ cm'];
+var binLegend = ui.Panel({
+  style: {position: 'bottom-right', padding: '8px 15px', width: '160px'}
+});
+binLegend.add(ui.Label('Depth Bins', {fontWeight: 'bold'}));
+for (var i = 0; i < binLabels.length; i++) {
+  var box = ui.Label('', {backgroundColor: '#' + binPalette[i], padding: '8px', margin: '0 8px 4px 0'});
+  var row = ui.Panel({widgets: [box, ui.Label(binLabels[i])], layout: ui.Panel.Layout.Flow('horizontal')});
+  binLegend.add(row);
+}
+Map.add(binLegend);

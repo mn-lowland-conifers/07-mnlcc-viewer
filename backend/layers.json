@@ -1,0 +1,167 @@
+{
+  "prob_lgbm": {
+    "name": "Lowland Conifer Probability (LGBM)",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/prob_lgbm",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": true,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "000000", "2b0000", "660000", "990000", "cc0000",
+        "e63900", "ff6600", "ff9900", "ffcc00", "ffff99"
+      ]
+    }
+  },
+
+  "comp_fibric": {
+    "name": "Peat Composition — Fibric %",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_fibric",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "fff7ec", "fee8c8", "fdd49e", "fdbb84", "fc8d59",
+        "ef6548", "d7301f", "b30000", "7f0000"
+      ]
+    }
+  },
+
+  "comp_hemic": {
+    "name": "Peat Composition — Hemic %",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_hemic",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "ffffe5", "fff7bc", "fee391", "fec44f", "fe9929",
+        "ec7014", "cc4c02", "993404", "662506"
+      ]
+    }
+  },
+
+  "comp_sapric": {
+    "name": "Peat Composition — Sapric %",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_sapric",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "f7f7f7", "d9d9d9", "bdbdbd", "969696", "737373",
+        "525252", "252525", "000000"
+      ]
+    }
+  },
+
+  "comp_mineral": {
+    "name": "Peat Composition — Mineral %",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_mineral",
+    "scale": 30,
+    "unit": "%",
+    "nodata_value": 255,
+    "value_multiplier": 0.5,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "fcfbfd", "efedf5", "dadaeb", "bcbddc", "9e9ac8",
+        "807dba", "6a51a3", "54278f", "3f007d"
+      ]
+    }
+  },
+
+  "depth": {
+    "name": "Predicted Peat Depth",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/depth",
+    "scale": 30,
+    "unit": " cm",
+    "nodata_value": 65535,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 350,
+      "palette": [
+        "000000", "2b0000", "660000", "990000", "cc0000",
+        "e63900", "ff6600", "ff9900", "ffcc00", "ffff99"
+      ]
+    }
+  },
+
+  "peat_extent_mask": {
+    "name": "Predicted Peat Extent (≥36.2% probability, excl. open water)",
+    "type": "threshold_binary",
+    "source_layer": "prob_lgbm",
+    "threshold": 36.2,
+    "exclude_nlcd_water": true,
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.5,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["ff6600"]
+    },
+    "classes": [
+      {"value": 1, "label": "Present", "color": "ff6600"}
+    ]
+  },
+
+  "carbon_belowground_fullstock": {
+    "name": "Belowground Carbon Stock (Full Profile)",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/carbon_belowground_fullstock",
+    "scale": 30,
+    "unit": " kgC/m²",
+    "nodata_value": 65535,
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 200,
+      "palette": [
+        "f7fcf5", "e5f5e0", "c7e9c0", "a1d99b", "74c476",
+        "41ab5d", "238b45", "006d2c", "00441b"
+      ]
+    }
+  }
+}

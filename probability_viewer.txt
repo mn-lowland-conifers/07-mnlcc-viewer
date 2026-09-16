@@ -1,0 +1,63 @@
+// ===================================================================
+// Peat Probability GEE viewer (updated 9/15/26)
+// ===================================================================
+
+// ---- CONFIG ----------------------------------------------------------
+var ASSET_ROOT = 'projects/PROJECT_NAME/assets/';
+
+// uint8 scale: pixel_value * 0.005 = probability (0-1)
+// LGBM threshold is 0.362 -> raw pixel 72.4, so raw.gte(72) below is the masking cutoff.
+var PROB_SCALE = 0.005;
+var PROB_THRESHOLD = 0.362;
+
+var probRaw = ee.Image(ASSET_ROOT + 'prob_lgbm_uint8_COG');
+var prob = probRaw.multiply(PROB_SCALE).rename('LGBM');
+var peatMask = prob.gte(PROB_THRESHOLD);
+
+var nlcd = ee.ImageCollection('USGS/NLCD_RELEASES/2021_REL/NLCD')
+  .filter(ee.Filter.eq('system:index', '2021'))
+  .first().select('landcover');
+var waterMask = nlcd.neq(11);
+var finalMask = peatMask.and(waterMask);
+
+// ---- Lava color ramp ------------------------------------------------------
+var lavaPalette = [
+  '000000', '2b0000', '660000', '990000', 'cc0000',
+  'e63900', 'ff6600', 'ff9900', 'ffcc00', 'ffff99'
+];
+var visProb = {min: 0.362, max: 1, palette: lavaPalette};
+
+// ---- MAP LAYERS ------------------------------------------------------------
+Map.setCenter(-94.0, 46.5, 7);
+Map.addLayer(prob.updateMask(finalMask), visProb, 'Peat Probability (lava)', true);
+Map.addLayer(nlcd.eq(11).selfMask(), {palette: ['000000']}, 'NLCD Open Water', false);
+
+// ---- LEGEND  -----------------------------------------------------------------
+function addGradientLegend(visParams, title) {
+  var lon = ee.Image.pixelLonLat().select('longitude');
+  var gradient = lon.multiply((visParams.max - visParams.min) / 100.0).add(visParams.min);
+  var legendImage = gradient.visualize(visParams);
+
+  var thumb = ui.Thumbnail({
+    image: legendImage,
+    params: {bbox: [0, 0, 100, 10], dimensions: '200x20'},
+    style: {stretch: 'horizontal', margin: '0px 8px'}
+  });
+
+  var minMaxRow = ui.Panel({
+    widgets: [
+      ui.Label(String(visParams.min), {margin: '4px 8px'}),
+      ui.Label('', {stretch: 'horizontal'}),
+      ui.Label(String(visParams.max), {margin: '4px 8px'})
+    ],
+    layout: ui.Panel.Layout.Flow('horizontal')
+  });
+
+  var panel = ui.Panel({
+    widgets: [ui.Label(title, {fontWeight: 'bold'}), thumb, minMaxRow],
+    style: {position: 'bottom-left', padding: '8px 15px'}
+  });
+  Map.add(panel);
+}
+
+addGradientLegend(visProb, 'Peat Probability (0-1)');
