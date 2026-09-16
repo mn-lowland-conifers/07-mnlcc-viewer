@@ -21,6 +21,7 @@
   },
 
   "comp_fibric": {
+    "enabled": false,
     "name": "Peat Composition — Fibric % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_fibric",
@@ -42,6 +43,7 @@
   },
 
   "comp_hemic": {
+    "enabled": false,
     "name": "Peat Composition — Hemic % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_hemic",
@@ -63,6 +65,7 @@
   },
 
   "comp_sapric": {
+    "enabled": false,
     "name": "Peat Composition — Sapric % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_sapric",
@@ -84,6 +87,7 @@
   },
 
   "comp_mineral": {
+    "enabled": false,
     "name": "Peat Composition — Mineral % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_mineral",
@@ -145,6 +149,7 @@
   },
 
   "water_mask": {
+    "enabled": false,
     "name": "NLCD Open Water MNLCCv1-0_16SEP2026",
     "type": "nlcd_water",
     "scale": 30,

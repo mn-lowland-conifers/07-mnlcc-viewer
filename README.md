@@ -28,16 +28,20 @@ Source data: 7 Cloud Optimized GeoTIFFs from `gs://mn-lowland-conifer-covars`, i
 assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (all `COMPLETED` — see
 `_ancillary/claude-chat-16SEP2026.md` for the ingest process and status history).
 
+Active (shown in the app):
+
 - Peatland Probability (LGBM) — `prob_lgbm`
-- Peat Composition — Fibric % — `comp_fibric`
-- Peat Composition — Hemic % — `comp_hemic`
-- Peat Composition — Sapric % — `comp_sapric`
-- Peat Composition — Mineral % — `comp_mineral`
 - Predicted Peat Depth — `depth`
-- Belowground Carbon Stock (Full Profile) — `carbon_belowground_fullstock` (viridis palette)
 - Predicted Peat Extent (≥36.2% probability) — `peat_extent_mask`, a toggleable reference overlay
   derived from `prob_lgbm`
-- NLCD Open Water — `water_mask`, a standalone toggleable reference overlay
+- Belowground Carbon Stock (Full Profile) — `carbon_belowground_fullstock` (viridis palette)
+
+Defined but currently disabled (`"enabled": false` in `layers.json` — configs kept for later
+reactivation, not deleted):
+
+- Peat Composition — Fibric % / Hemic % / Sapric % / Mineral % — `comp_fibric`, `comp_hemic`,
+  `comp_sapric`, `comp_mineral`
+- NLCD Open Water — `water_mask`
 
 Every layer's display name has `MNLCCv1-0_16SEP2026` appended (product version tag).
 
