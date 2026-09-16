@@ -1,6 +1,6 @@
 {
   "prob_lgbm": {
-    "name": "Lowland Conifer Probability (LGBM)",
+    "name": "Lowland Conifer Probability (LGBM) MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/prob_lgbm",
     "scale": 30,
@@ -21,7 +21,7 @@
   },
 
   "comp_fibric": {
-    "name": "Peat Composition — Fibric %",
+    "name": "Peat Composition — Fibric % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_fibric",
     "scale": 30,
@@ -42,7 +42,7 @@
   },
 
   "comp_hemic": {
-    "name": "Peat Composition — Hemic %",
+    "name": "Peat Composition — Hemic % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_hemic",
     "scale": 30,
@@ -63,7 +63,7 @@
   },
 
   "comp_sapric": {
-    "name": "Peat Composition — Sapric %",
+    "name": "Peat Composition — Sapric % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_sapric",
     "scale": 30,
@@ -84,7 +84,7 @@
   },
 
   "comp_mineral": {
-    "name": "Peat Composition — Mineral %",
+    "name": "Peat Composition — Mineral % MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/comp_mineral",
     "scale": 30,
@@ -105,7 +105,7 @@
   },
 
   "depth": {
-    "name": "Predicted Peat Depth",
+    "name": "Predicted Peat Depth MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/depth",
     "scale": 30,
@@ -125,7 +125,7 @@
   },
 
   "peat_extent_mask": {
-    "name": "Predicted Peat Extent (≥36.2% probability, excl. open water)",
+    "name": "Predicted Peat Extent (≥36.2% probability, excl. open water) MNLCCv1-0_16SEP2026",
     "type": "threshold_binary",
     "source_layer": "prob_lgbm",
     "threshold": 36.2,
@@ -146,7 +146,7 @@
   },
 
   "water_mask": {
-    "name": "NLCD Open Water",
+    "name": "NLCD Open Water MNLCCv1-0_16SEP2026",
     "type": "nlcd_water",
     "scale": 30,
     "unit": "",
@@ -164,7 +164,7 @@
   },
 
   "carbon_belowground_fullstock": {
-    "name": "Belowground Carbon Stock (Full Profile)",
+    "name": "Belowground Carbon Stock (Full Profile) MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/carbon_belowground_fullstock",
     "scale": 30,

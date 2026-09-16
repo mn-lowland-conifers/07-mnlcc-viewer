@@ -1,6 +1,0 @@
-fastapi
-uvicorn[standard]
-earthengine-api
-google-auth
-python-dotenv
-gunicorn
