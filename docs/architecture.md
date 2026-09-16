@@ -154,12 +154,24 @@ askdb-viewer's `threshold_binary`.
 The askdb-viewer sibling project additionally supports `peat_pf_combo` and `soil_extent_mask`
 derived layer types. Neither is wired up here since no current MNLCC layer needs them.
 
-### `peat_extent_mask` layer
+### `nlcd_water`
 
-A standalone, opt-in overlay (`threshold_binary` on `prob_lgbm` at 36.2%, i.e. the ≥0.362
-probability cutoff from Nic's trial GEE scripts, plus the NLCD open-water exclusion). It is
-`default_visible: false` — users toggle it on to see predicted peat extent as a reference boundary
-over any of the raw continuous layers, which themselves stay unmasked.
+A standalone categorical layer showing USGS NLCD 2021 open-water pixels (class 11), independent
+of any other layer — `landcover.eq(11).selfMask()`. The one current use is `water_mask` (see
+below). Shares the `_nlcd_landcover()` helper in `backend/layers.py` with `threshold_binary`'s
+`exclude_nlcd_water` option.
+
+### Reference overlay layers
+
+Two standalone, opt-in overlays, both `default_visible: false`:
+
+- `peat_extent_mask` — `threshold_binary` on `prob_lgbm` at 36.2%, i.e. the ≥0.362 probability
+  cutoff from Nic's trial GEE scripts, plus the NLCD open-water exclusion.
+- `water_mask` — `nlcd_water`, shown as a black reference layer, matching the "NLCD Open Water"
+  toggle in Nic's trial scripts.
+
+Users toggle these on individually to see predicted peat extent / open water as reference
+boundaries over any of the raw continuous layers, which themselves stay unmasked.
 
 ## Legends
 

@@ -8,6 +8,9 @@ It supports dynamic layer loading, satellite and OpenStreetMap basemaps, opacity
 geolocation, legends, and click-to-query raster values. Architecture mirrors the sibling
 `askdb-viewer` project (Alaska Soil Data Bank).
 
+**Live:** [maps.mnlowlandconifercarbon.org](https://maps.mnlowlandconifercarbon.org)
+(Cloudflare Pages, backed by a FastAPI service on Cloud Run).
+
 ## Current Capabilities
 
 - FastAPI backend
@@ -22,8 +25,8 @@ geolocation, legends, and click-to-query raster values. Architecture mirrors the
 ## Current Layers
 
 Source data: 7 Cloud Optimized GeoTIFFs from `gs://mn-lowland-conifer-covars`, ingested as GEE
-assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (see
-`claude-chat-16SEP2026.md` for the ingest process and status).
+assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (all `COMPLETED` — see
+`_ancillary/claude-chat-16SEP2026.md` for the ingest process and status history).
 
 - Lowland Conifer Probability (LGBM) — `prob_lgbm`
 - Peat Composition — Fibric % — `comp_fibric`
@@ -34,9 +37,10 @@ assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (see
 - Belowground Carbon Stock (Full Profile) — `carbon_belowground_fullstock`
 - Predicted Peat Extent (≥36.2% probability, excl. open water) — `peat_extent_mask`, a toggleable
   reference overlay derived from `prob_lgbm`; the raw layers above are never masked to it
+- NLCD Open Water — `water_mask`, a standalone toggleable reference overlay
 
 Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from his trial GEE
-scripts (`probability_viewer.txt`, `depth_viewer.txt` at the repo root).
+scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
 
 **Note:** the visualization range (`vis.max`) for `carbon_belowground_fullstock` in
 `backend/layers.json` is a placeholder estimate (200 kgC/m²) — tune it against actual data ranges
@@ -66,8 +70,13 @@ docs/
   architecture.md
   deployment.md
 
+_ancillary/
+  CLAUDE.md
+  claude-chat-16SEP2026.md
+
+x-example/            # askdb-viewer reference copy (not part of this app)
+
 README.md
-CLAUDE.md
 .gitignore
 ```
 
@@ -119,17 +128,20 @@ be added by editing `backend/layers.json`, without changing frontend code.
 
 ## Layer Configuration
 
-Map layers are configured in `backend/layers.json`. Two layer types are supported: `gee_image`
+Map layers are configured in `backend/layers.json`. Three layer types are supported: `gee_image`
 (a direct Earth Engine image asset, with nodata masking, valid min/max masking, value
-scaling/offset, and self-masking) and `threshold_binary` (binarizes another configured layer,
-optionally excluding NLCD open water). See `docs/architecture.md` for details.
+scaling/offset, and self-masking), `threshold_binary` (binarizes another configured layer,
+optionally excluding NLCD open water), and `nlcd_water` (a standalone open-water reference
+layer). See `docs/architecture.md` for details.
+
+## Deployment
+
+Live at `maps.mnlowlandconifercarbon.org` via Cloud Run (backend) + Cloudflare Pages (frontend).
+See `docs/deployment.md` for the full setup and checklist.
 
 ## Planned Next Steps
 
-- Confirm all 7 GEE assets finish ingesting and are set public (see `claude-chat-16SEP2026.md`)
 - Tune `carbon_belowground_fullstock` vis range against real data
-- Cloud Run + Cloudflare Pages deployment to `maps.mnlowlandconifercarbon.org` (see
-  `docs/deployment.md`)
 - Add observation/comment submission
 - Add Postgres/PostGIS support
 - Add authentication for expert validation

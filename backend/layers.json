@@ -145,6 +145,24 @@
     ]
   },
 
+  "water_mask": {
+    "name": "NLCD Open Water",
+    "type": "nlcd_water",
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 1,
+      "max": 1,
+      "palette": ["000000"]
+    },
+    "classes": [
+      {"value": 1, "label": "Open water", "color": "000000"}
+    ]
+  },
+
   "carbon_belowground_fullstock": {
     "name": "Belowground Carbon Stock (Full Profile)",
     "type": "gee_image",

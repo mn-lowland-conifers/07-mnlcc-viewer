@@ -6,7 +6,8 @@ import ee
 
 LAYER_FILE = Path(__file__).parent / "layers.json"
 
-# Used only by threshold_binary layers with "exclude_nlcd_water": true.
+# Used by threshold_binary layers with "exclude_nlcd_water": true, and by
+# the "nlcd_water" layer type.
 NLCD_COLLECTION = "USGS/NLCD_RELEASES/2021_REL/NLCD"
 NLCD_YEAR = "2021"
 NLCD_WATER_CLASS = 11
@@ -51,17 +52,19 @@ def _apply_common_transforms(img, cfg):
     return img
 
 
-def _nlcd_water_mask():
-    """Mask out USGS NLCD open-water pixels (class 11)."""
-
-    landcover = (
+def _nlcd_landcover():
+    return (
         ee.ImageCollection(NLCD_COLLECTION)
         .filter(ee.Filter.eq("system:index", NLCD_YEAR))
         .first()
         .select("landcover")
     )
 
-    return landcover.neq(NLCD_WATER_CLASS)
+
+def _nlcd_water_mask():
+    """Mask out USGS NLCD open-water pixels (class 11)."""
+
+    return _nlcd_landcover().neq(NLCD_WATER_CLASS)
 
 
 def get_layer_image(cfg):
@@ -91,6 +94,9 @@ def get_layer_image(cfg):
             img = img.updateMask(_nlcd_water_mask())
 
         return img
+
+    if layer_type == "nlcd_water":
+        return _nlcd_landcover().eq(NLCD_WATER_CLASS).selfMask()
 
     raise ValueError(f"Unsupported layer type: {layer_type}")
 
