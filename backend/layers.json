@@ -116,6 +116,7 @@
     "unit": " cm",
     "nodata_value": 65535,
     "legend_type": "continuous",
+    "clamp_max": true,
     "default_visible": false,
     "opacity": 0.75,
     "vis": {
@@ -175,6 +176,7 @@
     "unit": " kgC/m²",
     "nodata_value": 65535,
     "legend_type": "continuous",
+    "clamp_max": true,
     "default_visible": false,
     "opacity": 0.75,
     "vis": {

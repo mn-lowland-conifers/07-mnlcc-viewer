@@ -212,12 +212,14 @@ function addLegend(layerId) {
       })
       .join(", ");
 
+    const maxLabel = layer.clamp_max ? `${max}+` : `${max}`;
+
     div.innerHTML = `
       <div class="legend-title">${layer.name}</div>
       <div class="legend-gradient" style="background: linear-gradient(to right, ${gradient});"></div>
       <div class="legend-labels">
         <span>${min}${unit}</span>
-        <span>${max}${unit}</span>
+        <span>${maxLabel}${unit}</span>
       </div>
     `;
 

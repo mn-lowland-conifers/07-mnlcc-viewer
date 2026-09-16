@@ -126,6 +126,7 @@ def public_layer_metadata():
             "vis": cfg["vis"],
             "legend_type": cfg.get("legend_type", "continuous"),
             "classes": cfg.get("classes", []),
+            "clamp_max": cfg.get("clamp_max", False),
             "default_visible": cfg.get("default_visible", False),
             "opacity": cfg.get("opacity", 0.75),
         }
