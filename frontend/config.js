@@ -1,6 +1,4 @@
 window.MNLCC_CONFIG = {
-  // TODO: point at the deployed Cloud Run URL once the backend is live,
-  // e.g. "https://mnlcc-api-XXXXXXXXXXXX.us-central1.run.app"
-  // (see docs/deployment.md). Local dev default:
-  API_BASE: "http://127.0.0.1:8000"
+  // Local dev: swap to "http://127.0.0.1:8000" and run the backend locally.
+  API_BASE: "https://mnlcc-api-1062400256329.us-central1.run.app"
 };

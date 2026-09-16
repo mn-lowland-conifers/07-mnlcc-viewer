@@ -17,9 +17,9 @@ Cloud Run (backend)
 Google Earth Engine
 ```
 
-**Status: not yet deployed.** Production domain: `maps.mnlowlandconifercarbon.org`, a zone Nic
-already owns and manages on Cloudflare (DNS only so far — no Pages project or backend yet). This
-document describes the intended setup; fill in the remaining TODOs as each step is completed.
+**Status: backend live, frontend not yet deployed.** Production domain:
+`maps.mnlowlandconifercarbon.org`, a zone Nic already owns and manages on Cloudflare (DNS only
+so far — no Pages project yet).
 
 ## Frontend
 
@@ -32,20 +32,18 @@ frontend/style.css
 frontend/config.js
 ```
 
-`frontend/config.js` sets `API_BASE`, which must point at the deployed Cloud Run URL in
-production. Local dev default:
+`frontend/config.js` sets `API_BASE`, currently pointed at the live backend:
 
 ```javascript
 window.MNLCC_CONFIG = {
-  API_BASE: "http://127.0.0.1:8000"
+  API_BASE: "https://mnlcc-api-1062400256329.us-central1.run.app"
 };
 ```
 
+For local dev, temporarily swap that to `http://127.0.0.1:8000` and run the backend locally.
+
 Custom domain: **`maps.mnlowlandconifercarbon.org`** (Cloudflare — same account already holds
 the zone, so no DNS registrar changes needed, only the Pages setup below).
-
-TODO once deployed:
-- Update `API_BASE` to the live Cloud Run URL
 
 ## Backend
 
@@ -67,13 +65,17 @@ gcloud run deploy mnlcc-api \
 The `^;^` prefix on `--set-env-vars` remaps gcloud's list delimiter to `;`, since
 `CORS_ORIGINS` itself contains commas.
 
-TODO:
-- Create service account `mnlcc-api-runner@ee-jeli0026.iam.gserviceaccount.com` and grant:
-  - `roles/earthengine.writer` (not `viewer` — tile map ID generation needs the writer role's
-    permission set; confirmed the hard way on askdb-viewer)
-  - `roles/serviceusage.serviceUsageConsumer`
-- Confirm Cloud Run Admin API / Cloud Build API / Artifact Registry API are enabled on
-  `ee-jeli0026` (already true if askdb-viewer's Cloud Run setup is live on the same project)
+**Done:** `mnlcc-api-runner@ee-jeli0026.iam.gserviceaccount.com` created with
+`roles/earthengine.writer` + `roles/serviceusage.serviceUsageConsumer` (not `viewer` — tile map
+ID generation needs the writer role's permission set; confirmed the hard way on askdb-viewer).
+Required APIs (Cloud Run Admin, Cloud Build, Artifact Registry, IAM) were already enabled on
+`ee-jeli0026` from the askdb-viewer setup.
+
+**Live:** deployed via the command above. Service URL:
+`https://mnlcc-api-1062400256329.us-central1.run.app`. `/health` and `/layers` verified working
+(EE auth via ADC confirmed). `/tiles/{layer_id}` will 500 with "Image asset ... not found" for
+any layer whose GEE asset hasn't finished ingesting yet — not a backend bug, just ingest status;
+see `claude-chat-16SEP2026.md`.
 
 ## Environment Variables
 
@@ -93,27 +95,26 @@ which tries ADC first and falls back to the local user token.
 
 ## Deployment Checklist
 
-1. Confirm all 7 GEE assets are `COMPLETED` and public (see the ingest handoff doc,
-   `claude-chat-16SEP2026.md`, at the repo root).
-2. Push this repo to `origin` (`mn-lowland-conifers/07-mnlcc-viewer` on GitHub) — the repo has no
-   commits yet, and Cloudflare Pages deploys from the GitHub connection, not a local push.
-3. Create `mnlcc-api-runner` service account with the IAM roles above (one-time, in the GCP
-   Console or via `gcloud iam service-accounts create`).
-4. `gcloud run deploy` per the command above (from `07-mnlcc-viewer/`). Note the resulting
-   `*.run.app` URL.
-5. Test `/health`, `/layers`, `/tiles/{layer_id}`, `/value/{layer_id}` against that URL.
-6. Update `frontend/config.js` `API_BASE` to the live Cloud Run URL; commit and push.
-7. In the Cloudflare dashboard: **Workers & Pages → Create application → Pages → Connect to
-   Git** → select `mn-lowland-conifers/07-mnlcc-viewer`, branch `main`. Build settings:
-   framework preset **None**, no build command, **build output directory: `frontend`** (the
-   site lives in a subdirectory, not the repo root). Save and deploy.
+1. ~~Confirm all 7 GEE assets are `COMPLETED`~~ — 5 of 7 `COMPLETED`, 2 `RUNNING` as of
+   2026-09-16. Public ACLs not yet confirmed set (see `claude-chat-16SEP2026.md`).
+2. ~~Push this repo to `origin`~~ — done.
+3. ~~Create `mnlcc-api-runner` service account with the IAM roles above~~ — done.
+4. ~~`gcloud run deploy`~~ — done. URL: `https://mnlcc-api-1062400256329.us-central1.run.app`.
+5. ~~Test `/health`, `/layers`~~ — both verified working. `/tiles/{layer_id}` /
+   `/value/{layer_id}` to be reverified once all 7 assets finish ingesting.
+6. ~~Update `frontend/config.js` `API_BASE`~~ — done.
+7. **Next:** in the Cloudflare dashboard: **Workers & Pages → Create application → Pages →
+   Connect to Git** → select `mn-lowland-conifers/07-mnlcc-viewer`, branch `main`. Build
+   settings: framework preset **None**, no build command, **build output directory: `frontend`**
+   (the site lives in a subdirectory, not the repo root). Save and deploy.
 8. In the new Pages project: **Custom domains → Add a custom domain** →
    `maps.mnlowlandconifercarbon.org`. Since the zone is already on this Cloudflare account, the
    CNAME is added automatically — no registrar/DNS changes needed. HTTPS provisions
    automatically too.
-9. Back on Cloud Run, redeploy with `CORS_ORIGINS` including
-   `https://maps.mnlowlandconifercarbon.org` (already in the command above).
-10. Verify end to end at `https://maps.mnlowlandconifercarbon.org`.
+9. `CORS_ORIGINS` already includes `https://maps.mnlowlandconifercarbon.org` from step 4 — no
+   backend redeploy needed for this unless the domain changes.
+10. Once the last 2 GEE assets finish ingesting, verify end to end at
+    `https://maps.mnlowlandconifercarbon.org`.
 
 After this initial setup, both sides redeploy automatically on push to `main`: Cloudflare Pages
 watches the GitHub connection directly, and Cloud Run needs a new `gcloud run deploy` (not
