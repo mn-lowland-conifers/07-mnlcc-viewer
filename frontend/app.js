@@ -61,11 +61,14 @@ async function loadLayers() {
   }
 
   let defaultLayerIds = layerIds.filter(
-    (layerId) => layerMetadata[layerId].default_visible
+    (layerId) => layerMetadata[layerId].default_visible && geeLayers[layerId]
   );
 
-  if (defaultLayerIds.length === 0 && layerIds.length > 0) {
-    defaultLayerIds = [layerIds[0]];
+  if (defaultLayerIds.length === 0) {
+    const firstRegisteredId = layerIds.find((layerId) => geeLayers[layerId]);
+    if (firstRegisteredId) {
+      defaultLayerIds = [firstRegisteredId];
+    }
   }
 
   for (const layerId of defaultLayerIds) {
@@ -80,7 +83,13 @@ async function loadLayers() {
 async function registerGeeLayer(layerId) {
   const layer = layerMetadata[layerId];
 
-  const response = await fetch(`${API_BASE}/tiles/${layerId}`);
+  let response;
+  try {
+    response = await fetch(`${API_BASE}/tiles/${layerId}`);
+  } catch (error) {
+    console.error(`Could not load layer: ${layerId}`, error);
+    return;
+  }
 
   if (!response.ok) {
     console.error(`Could not load layer: ${layerId}`);

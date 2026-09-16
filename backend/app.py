@@ -64,7 +64,10 @@ def tiles(layer_id: str):
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-    map_id = img.getMapId(cfg["vis"])
+    try:
+        map_id = img.getMapId(cfg["vis"])
+    except ee.ee_exception.EEException as e:
+        raise HTTPException(status_code=502, detail=str(e))
 
     return {
         "layer_id": layer_id,
@@ -87,12 +90,15 @@ def value(layer_id: str, lat: float, lon: float):
     pt = ee.Geometry.Point([lon, lat])
     scale = cfg.get("scale", 30)
 
-    result = img.reduceRegion(
-        reducer=ee.Reducer.first(),
-        geometry=pt,
-        scale=scale,
-        maxPixels=1e6,
-    ).getInfo()
+    try:
+        result = img.reduceRegion(
+            reducer=ee.Reducer.first(),
+            geometry=pt,
+            scale=scale,
+            maxPixels=1e6,
+        ).getInfo()
+    except ee.ee_exception.EEException as e:
+        raise HTTPException(status_code=502, detail=str(e))
 
     return {
         "layer_id": layer_id,
