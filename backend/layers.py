@@ -6,11 +6,15 @@ import ee
 
 LAYER_FILE = Path(__file__).parent / "layers.json"
 
-# Used by threshold_binary layers with "exclude_nlcd_water": true, and by
-# the "nlcd_water" layer type.
+# Used to auto-mask every gee_image layer (open water + developed/impervious),
+# by threshold_binary layers with "exclude_nlcd_water": true, and by the
+# "nlcd_water" layer type.
 NLCD_COLLECTION = "USGS/NLCD_RELEASES/2021_REL/NLCD"
 NLCD_YEAR = "2021"
 NLCD_WATER_CLASS = 11
+# Developed, Open Space / Low / Medium / High Intensity.
+NLCD_DEVELOPED_CLASSES = [21, 22, 23, 24]
+NLCD_EXCLUDED_CLASSES = [NLCD_WATER_CLASS] + NLCD_DEVELOPED_CLASSES
 
 
 def load_layers():
@@ -27,6 +31,8 @@ def get_layer_config(layer_id: str):
 
 def _apply_common_transforms(img, cfg):
     """Apply common masking and scaling operations to a GEE image."""
+
+    img = img.updateMask(_nlcd_exclusion_mask())
 
     if "nodata_value" in cfg:
         nodata = cfg["nodata_value"]
@@ -61,10 +67,16 @@ def _nlcd_landcover():
     )
 
 
-def _nlcd_water_mask():
-    """Mask out USGS NLCD open-water pixels (class 11)."""
+def _nlcd_exclusion_mask():
+    """Mask out USGS NLCD open water + developed/impervious pixels."""
 
-    return _nlcd_landcover().neq(NLCD_WATER_CLASS)
+    landcover = _nlcd_landcover()
+    mask = landcover.neq(NLCD_EXCLUDED_CLASSES[0])
+
+    for cls in NLCD_EXCLUDED_CLASSES[1:]:
+        mask = mask.And(landcover.neq(cls))
+
+    return mask
 
 
 def get_layer_image(cfg):
@@ -91,7 +103,7 @@ def get_layer_image(cfg):
         img = source_img.gte(threshold).selfMask()
 
         if cfg.get("exclude_nlcd_water", False):
-            img = img.updateMask(_nlcd_water_mask())
+            img = img.updateMask(_nlcd_exclusion_mask())
 
         return img
 

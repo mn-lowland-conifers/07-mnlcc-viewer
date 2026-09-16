@@ -1,6 +1,6 @@
 {
   "prob_lgbm": {
-    "name": "Lowland Conifer Probability (LGBM) MNLCCv1-0_16SEP2026",
+    "name": "Peatland Probability (LGBM) MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/prob_lgbm",
     "scale": 30,
@@ -125,11 +125,10 @@
   },
 
   "peat_extent_mask": {
-    "name": "Predicted Peat Extent (≥36.2% probability, excl. open water) MNLCCv1-0_16SEP2026",
+    "name": "Predicted Peat Extent (≥36.2% probability) MNLCCv1-0_16SEP2026",
     "type": "threshold_binary",
     "source_layer": "prob_lgbm",
     "threshold": 36.2,
-    "exclude_nlcd_water": true,
     "scale": 30,
     "unit": "",
     "legend_type": "categorical",
@@ -177,8 +176,10 @@
       "min": 0,
       "max": 200,
       "palette": [
-        "f7fcf5", "e5f5e0", "c7e9c0", "a1d99b", "74c476",
-        "41ab5d", "238b45", "006d2c", "00441b"
+        "440154", "481567", "482677", "453581", "404688",
+        "39568c", "33638d", "2d708e", "287c8e", "23888e",
+        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
+        "73d055", "95d840", "b8de29", "dce319", "fde725"
       ]
     }
   }

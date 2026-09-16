@@ -129,11 +129,18 @@ Example:
 
 A direct Earth Engine image asset. The seven raw MNLCC layers (probability, four compositional
 percentages, depth, carbon stock) are single-band ingested assets under
-`projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/`, all using this type. They are never
-masked to a predicted-extent boundary — each shows wherever its own source asset has valid data.
+`projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/`, all using this type.
+
+Every `gee_image` layer is **automatically masked** to exclude USGS NLCD 2021 open water (class
+11) and developed/impervious land (classes 21-24, Open Space through High Intensity) —
+`_apply_common_transforms()` in `backend/layers.py` applies `_nlcd_exclusion_mask()`
+unconditionally, before any other transform. Masked pixels render fully transparent (not a solid
+color), so basemap/imagery shows through. This is unconditional for every `gee_image` layer; there
+is currently no per-layer opt-out.
 
 Supported transformations (`_apply_common_transforms` in `backend/layers.py`):
 
+- NLCD water + developed exclusion (see above; always applied)
 - `nodata_value` — exact-value mask (255 for the uint8 layers, 65535 for the uint16 layers)
 - `valid_min` / `valid_max` — inequality mask
 - `value_multiplier` / `value_offset` — rescale raw stored values to public units
@@ -147,31 +154,35 @@ Binarizes another *configured* layer (via `source_layer` + `threshold`, compared
 i.e. in the same units as the source layer's public values — e.g. percent, not raw 0-200).
 Ported from askdb-viewer's pattern; the one current use is `peat_extent_mask` (see below).
 
-Optional `exclude_nlcd_water: true` additionally masks out USGS NLCD 2021 open-water pixels
-(`_nlcd_water_mask()` in `backend/layers.py`). This is a MNLCC-specific addition not present in
-askdb-viewer's `threshold_binary`.
+Optional `exclude_nlcd_water: true` additionally applies `_nlcd_exclusion_mask()` directly (on
+top of whatever the source layer already applied). Redundant for any `threshold_binary` whose
+source is a `gee_image` layer (already auto-masked — see above), but kept as an explicit option
+for robustness if a future source layer type isn't auto-masked.
 
 The askdb-viewer sibling project additionally supports `peat_pf_combo` and `soil_extent_mask`
 derived layer types. Neither is wired up here since no current MNLCC layer needs them.
 
 ### `nlcd_water`
 
-A standalone categorical layer showing USGS NLCD 2021 open-water pixels (class 11), independent
-of any other layer — `landcover.eq(11).selfMask()`. The one current use is `water_mask` (see
-below). Shares the `_nlcd_landcover()` helper in `backend/layers.py` with `threshold_binary`'s
-`exclude_nlcd_water` option.
+A standalone categorical layer showing USGS NLCD 2021 open-water pixels only (class 11),
+independent of any other layer or of the water+developed exclusion above —
+`landcover.eq(11).selfMask()`. Does **not** go through `_apply_common_transforms`, so it is
+unaffected by the auto-masking. The one current use is `water_mask` (see below). Shares the
+`_nlcd_landcover()` helper in `backend/layers.py` with the exclusion mask.
 
 ### Reference overlay layers
 
 Two standalone, opt-in overlays, both `default_visible: false`:
 
-- `peat_extent_mask` — `threshold_binary` on `prob_lgbm` at 36.2%, i.e. the ≥0.362 probability
-  cutoff from Nic's trial GEE scripts, plus the NLCD open-water exclusion.
+- `peat_extent_mask` — `threshold_binary` on `prob_lgbm` at 36.2%, the ≥0.362 probability cutoff
+  from Nic's trial GEE scripts. (No longer needs its own `exclude_nlcd_water` — inherited from
+  `prob_lgbm`'s auto-mask.)
 - `water_mask` — `nlcd_water`, shown as a black reference layer, matching the "NLCD Open Water"
   toggle in Nic's trial scripts.
 
-Users toggle these on individually to see predicted peat extent / open water as reference
-boundaries over any of the raw continuous layers, which themselves stay unmasked.
+These exist for users who want to see predicted peat extent or open water as an explicit
+reference boundary on the map, distinct from the automatic water/developed exclusion that now
+applies to every raw layer regardless of whether either toggle is on.
 
 ## Legends
 

@@ -28,24 +28,30 @@ Source data: 7 Cloud Optimized GeoTIFFs from `gs://mn-lowland-conifer-covars`, i
 assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (all `COMPLETED` — see
 `_ancillary/claude-chat-16SEP2026.md` for the ingest process and status history).
 
-- Lowland Conifer Probability (LGBM) — `prob_lgbm`
+- Peatland Probability (LGBM) — `prob_lgbm`
 - Peat Composition — Fibric % — `comp_fibric`
 - Peat Composition — Hemic % — `comp_hemic`
 - Peat Composition — Sapric % — `comp_sapric`
 - Peat Composition — Mineral % — `comp_mineral`
 - Predicted Peat Depth — `depth`
-- Belowground Carbon Stock (Full Profile) — `carbon_belowground_fullstock`
-- Predicted Peat Extent (≥36.2% probability, excl. open water) — `peat_extent_mask`, a toggleable
-  reference overlay derived from `prob_lgbm`; the raw layers above are never masked to it
+- Belowground Carbon Stock (Full Profile) — `carbon_belowground_fullstock` (viridis palette)
+- Predicted Peat Extent (≥36.2% probability) — `peat_extent_mask`, a toggleable reference overlay
+  derived from `prob_lgbm`
 - NLCD Open Water — `water_mask`, a standalone toggleable reference overlay
+
+Every layer's display name has `MNLCCv1-0_16SEP2026` appended (product version tag).
+
+All 7 raw layers are automatically masked to exclude USGS NLCD 2021 open water and
+developed/impervious land (fully transparent, not a solid color) — this is unconditional, not a
+toggle. `peat_extent_mask` and `water_mask` above are separate opt-in reference overlays for
+showing predicted extent / water boundaries explicitly.
 
 Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from his trial GEE
 scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
 
 **Note:** the visualization range (`vis.max`) for `carbon_belowground_fullstock` in
 `backend/layers.json` is a placeholder estimate (200 kgC/m²) — tune it against actual data ranges
-once the assets are live (e.g. via `reduceRegion` with `ee.Reducer.minMax()` in the GEE Code
-Editor).
+(e.g. via `reduceRegion` with `ee.Reducer.minMax()` in the GEE Code Editor).
 
 ## Repository Structure
 
@@ -129,10 +135,11 @@ be added by editing `backend/layers.json`, without changing frontend code.
 ## Layer Configuration
 
 Map layers are configured in `backend/layers.json`. Three layer types are supported: `gee_image`
-(a direct Earth Engine image asset, with nodata masking, valid min/max masking, value
-scaling/offset, and self-masking), `threshold_binary` (binarizes another configured layer,
-optionally excluding NLCD open water), and `nlcd_water` (a standalone open-water reference
-layer). See `docs/architecture.md` for details.
+(a direct Earth Engine image asset — automatically masked to exclude NLCD open water and
+developed/impervious land, plus nodata masking, valid min/max masking, value scaling/offset, and
+self-masking), `threshold_binary` (binarizes another configured layer), and `nlcd_water` (a
+standalone open-water reference layer, unaffected by the auto-masking). See
+`docs/architecture.md` for details.
 
 ## Deployment
 
