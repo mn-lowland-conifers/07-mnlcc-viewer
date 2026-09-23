@@ -51,6 +51,12 @@ the Mesabi Iron Range open pits), fully transparent rather than a solid color. T
 unconditional, not a toggle. `peat_extent_mask` and `water_mask` above are separate opt-in
 reference overlays for showing predicted extent / water boundaries explicitly.
 
+All layers are also masked (fully transparent) over tribal lands, using the dissolved polygon
+asset `projects/ee-jeli0026/assets/tribal-lands-mask-dissolved-23SEP2026`. The polygons are drawn
+as a thin dark-grey outline with transparent fill by a silent `tribal_outline` overlay — served
+via `GET /outlines`, not listed in `/layers`, so it has no legend entry, layer-control toggle, or
+click-query behavior.
+
 Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from his trial GEE
 scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
 
@@ -117,6 +123,7 @@ Backend endpoints:
 GET /
 GET /health
 GET /layers
+GET /outlines
 GET /tiles/{layer_id}
 GET /value/{layer_id}?lat={lat}&lon={lon}
 ```

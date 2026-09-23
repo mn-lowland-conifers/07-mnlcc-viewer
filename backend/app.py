@@ -5,7 +5,12 @@ import google.auth
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from layers import get_layer_config, get_layer_image, public_layer_metadata
+from layers import (
+    get_layer_config,
+    get_layer_image,
+    outline_layer_ids,
+    public_layer_metadata,
+)
 
 
 def _init_earth_engine():
@@ -50,6 +55,25 @@ def health():
 @app.get("/layers")
 def layers():
     return public_layer_metadata()
+
+
+@app.get("/outlines")
+def outlines():
+    """Tile URLs for silent outline overlays (drawn on the map, but not part
+    of the layer catalog)."""
+
+    result = {}
+
+    for layer_id in outline_layer_ids():
+        try:
+            img = get_layer_image(get_layer_config(layer_id))
+            map_id = img.getMapId({})
+        except ee.ee_exception.EEException as e:
+            raise HTTPException(status_code=502, detail=str(e))
+
+        result[layer_id] = map_id["tile_fetcher"].url_format
+
+    return result
 
 
 @app.get("/tiles/{layer_id}")

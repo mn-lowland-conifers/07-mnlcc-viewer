@@ -20,6 +20,10 @@ NLCD_EXCLUDED_CLASSES = (
     [NLCD_WATER_CLASS] + NLCD_DEVELOPED_CLASSES + [NLCD_BARREN_CLASS]
 )
 
+# Polygons (dissolved tribal lands) that are masked out of every data layer and
+# drawn as a silent outline overlay (see "tribal_outline" layer type).
+TRIBAL_MASK_ASSET = "projects/ee-jeli0026/assets/tribal-lands-mask-dissolved-23SEP2026"
+
 
 def load_layers():
     with open(LAYER_FILE, "r") as f:
@@ -37,6 +41,7 @@ def _apply_common_transforms(img, cfg):
     """Apply common masking and scaling operations to a GEE image."""
 
     img = img.updateMask(_nlcd_exclusion_mask())
+    img = img.updateMask(_tribal_mask())
 
     if "nodata_value" in cfg:
         nodata = cfg["nodata_value"]
@@ -83,6 +88,16 @@ def _nlcd_exclusion_mask():
     return mask
 
 
+def _tribal_features():
+    return ee.FeatureCollection(TRIBAL_MASK_ASSET)
+
+
+def _tribal_mask():
+    """Mask that is 0 inside tribal-land polygons and 1 everywhere else."""
+
+    return ee.Image(0).byte().paint(_tribal_features(), 1).eq(0)
+
+
 def get_layer_image(cfg):
     layer_type = cfg["type"]
 
@@ -112,7 +127,19 @@ def get_layer_image(cfg):
         return img
 
     if layer_type == "nlcd_water":
-        return _nlcd_landcover().eq(NLCD_WATER_CLASS).selfMask()
+        return (
+            _nlcd_landcover()
+            .eq(NLCD_WATER_CLASS)
+            .selfMask()
+            .updateMask(_tribal_mask())
+        )
+
+    if layer_type == "tribal_outline":
+        return _tribal_features().style(
+            color=cfg.get("color", "555555"),
+            width=cfg.get("width", 1),
+            fillColor="00000000",
+        )
 
     raise ValueError(f"Unsupported layer type: {layer_type}")
 
@@ -131,5 +158,16 @@ def public_layer_metadata():
             "opacity": cfg.get("opacity", 0.75),
         }
         for layer_id, cfg in LAYERS.items()
-        if cfg.get("enabled", True)
+        if cfg.get("enabled", True) and cfg["type"] != "tribal_outline"
     }
+
+
+def outline_layer_ids():
+    """IDs of silent outline overlays: served to the frontend via /outlines,
+    not listed in /layers (no legend, layer control entry, or click query)."""
+
+    return [
+        layer_id
+        for layer_id, cfg in LAYERS.items()
+        if cfg["type"] == "tribal_outline" and cfg.get("enabled", True)
+    ]

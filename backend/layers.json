@@ -189,5 +189,13 @@
         "73d055", "95d840", "b8de29", "dce319", "fde725"
       ]
     }
+  },
+
+  "tribal_outline": {
+    "name": "Tribal lands outline",
+    "type": "tribal_outline",
+    "color": "555555",
+    "width": 1,
+    "vis": {}
   }
 }

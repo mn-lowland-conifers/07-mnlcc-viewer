@@ -113,6 +113,32 @@ async function registerGeeLayer(layerId) {
   layerControl.addOverlay(geeLayer, layer.name || layerId);
 }
 
+// Silent outline overlays (e.g. tribal lands): always drawn, above the data
+// layers, but not in the layer control, legend, or click-to-query.
+async function loadOutlines() {
+  let outlines;
+  try {
+    const response = await fetch(`${API_BASE}/outlines`);
+    if (!response.ok) {
+      console.error("Could not load outline overlays");
+      return;
+    }
+    outlines = await response.json();
+  } catch (error) {
+    console.error("Could not load outline overlays", error);
+    return;
+  }
+
+  map.createPane("outlines");
+  const pane = map.getPane("outlines");
+  pane.style.zIndex = 250;
+  pane.style.pointerEvents = "none";
+
+  for (const tileUrl of Object.values(outlines)) {
+    L.tileLayer(tileUrl, { pane: "outlines", attribution: "Google Earth Engine" }).addTo(map);
+  }
+}
+
 function setActiveLayer(layerId) {
   if (!layerId || !geeLayers[layerId]) {
     return;
@@ -414,3 +440,4 @@ map.on("click", async function (e) {
 // -----------------------------
 
 loadLayers();
+loadOutlines();

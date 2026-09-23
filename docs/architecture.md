@@ -88,6 +88,11 @@ Returns simple backend health status.
 
 Returns public metadata for every configured map layer.
 
+### `GET /outlines`
+
+Returns tile URLs for silent outline overlays (currently `tribal_outline`). Drawn by the frontend
+above the data layers, but not part of `/layers`: no legend, layer-control entry, or click query.
+
 ### `GET /tiles/{layer_id}`
 
 Returns an XYZ tile URL for a given layer. The backend constructs the Earth Engine image, applies
@@ -172,6 +177,14 @@ independent of any other layer or of the water+developed exclusion above —
 `landcover.eq(11).selfMask()`. Does **not** go through `_apply_common_transforms`, so it is
 unaffected by the auto-masking. The one current use is `water_mask` (see below). Shares the
 `_nlcd_landcover()` helper in `backend/layers.py` with the exclusion mask.
+
+### Tribal lands mask and `tribal_outline`
+
+`TRIBAL_MASK_ASSET` in `backend/layers.py` (dissolved tribal-lands polygons) is rasterized with
+`.paint()` and applied unconditionally in `_apply_common_transforms()` (and to `nlcd_water`), so no
+layer shows data inside the polygons. The `tribal_outline` layer type draws the same polygons via
+`FeatureCollection.style()` (dark grey, 1px, transparent fill). It is excluded from
+`public_layer_metadata()` and exposed only through `/outlines`.
 
 ### Reference overlay layers
 
