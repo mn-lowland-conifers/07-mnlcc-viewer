@@ -64,9 +64,12 @@ outside it. Like the tribal mask, this is unconditional (no toggle) and has no o
 Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from his trial GEE
 scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
 
-**Note:** the visualization range (`vis.max`) for `carbon_belowground_fullstock` in
-`backend/layers.json` is a placeholder estimate (200 kgC/m²) — tune it against actual data ranges
-(e.g. via `reduceRegion` with `ee.Reducer.minMax()` in the GEE Code Editor).
+The visualization ranges (`vis.min`/`vis.max`) for `prob_lgbm` (0–99.5 %), `depth` (6–456 cm) and
+`carbon_belowground_fullstock` (33–253 kgC/m²) in `backend/layers.json` are the actual min/max of
+the visible 30 m pixels — i.e. after every mask (prediction domain, tribal lands, NLCD exclusions,
+and the peat-extent `mask_layer` for depth/carbon). Computed 2026-10-21 with `ee.Reducer.minMax()`
+over a 50 km grid covering the domain (a single domain-wide `reduceRegion` times out). Recompute if
+the assets or masks change.
 
 ## Repository Structure
 
