@@ -3,6 +3,8 @@
     "name": "Peatland Probability (LGBM) MNLCCv1-0_16SEP2026",
     "type": "gee_image",
     "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/prob_lgbm",
+    "mask_layer": "peat_extent_mask",
+    "mask_layer_min_pixel_m": 45,
     "scale": 30,
     "unit": "%",
     "nodata_value": 255,
@@ -182,8 +184,8 @@
     "default_visible": false,
     "opacity": 0.75,
     "vis": {
-      "min": 33,
-      "max": 253,
+      "min": 45,
+      "max": 130,
       "palette": [
         "440154", "481567", "482677", "453581", "404688",
         "39568c", "33638d", "2d708e", "287c8e", "23888e",

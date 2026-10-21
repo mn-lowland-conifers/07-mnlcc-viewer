@@ -109,7 +109,7 @@ def _domain_mask():
     return ee.Image(0).byte().paint(ee.FeatureCollection(DOMAIN_MASK_ASSET), 1)
 
 
-def get_layer_image(cfg):
+def get_layer_image(cfg, apply_mask_layer=True):
     layer_type = cfg["type"]
 
     if layer_type == "gee_image":
@@ -123,13 +123,22 @@ def get_layer_image(cfg):
         # Clip to another layer's footprint (e.g. peat_extent_mask). Evaluated
         # at the map's zoom-level scale, so this layer appears and disappears
         # exactly where the mask layer does when zoomed out.
-        if "mask_layer" in cfg:
+        if apply_mask_layer and "mask_layer" in cfg:
             mask_cfg = get_layer_config(cfg["mask_layer"])
 
             if mask_cfg is None:
                 raise ValueError(f"Mask layer not found: {cfg['mask_layer']}")
 
-            img = img.updateMask(get_layer_image(mask_cfg))
+            mask = get_layer_image(mask_cfg).unmask(0)
+
+            # Optionally apply the mask only when zoomed out: pixelArea() is
+            # evaluated in the output projection, so it grows with the tile's
+            # pixel size. Below the threshold the mask is all ones.
+            if "mask_layer_min_pixel_m" in cfg:
+                min_px = cfg["mask_layer_min_pixel_m"]
+                mask = mask.Or(ee.Image.pixelArea().lt(min_px * min_px))
+
+            img = img.updateMask(mask)
 
         return img
 
@@ -140,7 +149,9 @@ def get_layer_image(cfg):
         if source_cfg is None:
             raise ValueError(f"Source layer not found: {source_layer_id}")
 
-        source_img = get_layer_image(source_cfg)
+        # Skip the source's own mask_layer: a source masked by this layer
+        # (prob_lgbm by peat_extent_mask) would otherwise recurse forever.
+        source_img = get_layer_image(source_cfg, apply_mask_layer=False)
 
         threshold = cfg["threshold"]
         img = source_img.gte(threshold).selfMask()

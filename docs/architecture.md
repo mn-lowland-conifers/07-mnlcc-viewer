@@ -201,6 +201,13 @@ Because Earth Engine evaluates the threshold at the tile's zoom-level scale (on 
 it, their own mean pyramids show any coarse pixel containing a single valid 30 m pixel, so they look
 far more extensive than the extent layer when zoomed out.
 
+`prob_lgbm` also uses `"mask_layer": "peat_extent_mask"`, plus `"mask_layer_min_pixel_m": 45`, which
+applies the mask only when the output pixel is coarser than 45 m (tested via `ee.Image.pixelArea()`,
+which is evaluated in the tile's projection). In Minnesota that switch falls between web-map zoom 11
+(~53 m pixels, masked) and zoom 12 (~26 m, unmasked), so full-resolution views and `/value` clicks
+still show every probability. Since `peat_extent_mask` is derived from `prob_lgbm`,
+`threshold_binary` fetches its source with `apply_mask_layer=False` to avoid recursion.
+
 ### Reference overlay layers
 
 Two standalone, opt-in overlays, both `default_visible: false`:

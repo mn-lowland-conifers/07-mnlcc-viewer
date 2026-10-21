@@ -65,11 +65,15 @@ Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from hi
 scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
 
 The visualization ranges (`vis.min`/`vis.max`) for `prob_lgbm` (0–99.5 %), `depth` (6–456 cm) and
-`carbon_belowground_fullstock` (33–253 kgC/m²) in `backend/layers.json` are the actual min/max of
+`carbon_belowground_fullstock` (33–253 kgC/m²) were set from the actual min/max of
 the visible 30 m pixels — i.e. after every mask (prediction domain, tribal lands, NLCD exclusions,
 and the peat-extent `mask_layer` for depth/carbon). Computed 2026-10-21 with `ee.Reducer.minMax()`
 over a 50 km grid covering the domain (a single domain-wide `reduceRegion` times out). Recompute if
 the assets or masks change.
+
+Carbon was then narrowed to 45–130 kgC/m² (≈ 1st–99th percentile; 99% of visible pixels fall in
+that range), so viridis spans its full range instead of only the bottom ~40%. Depth and carbon
+legends show "+" on the max label (`clamp_max`).
 
 ## Repository Structure
 
