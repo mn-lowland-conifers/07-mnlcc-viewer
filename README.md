@@ -51,6 +51,10 @@ the Mesabi Iron Range open pits), fully transparent rather than a solid color. T
 unconditional, not a toggle. `peat_extent_mask` and `water_mask` above are separate opt-in
 reference overlays for showing predicted extent / water boundaries explicitly.
 
+`depth` and `carbon_belowground_fullstock` are clipped to `peat_extent_mask` at every zoom, and
+`prob_lgbm` is clipped to it only when zoomed out (web-map zoom ≤ 11), so all three show the same
+footprint at statewide views instead of depth/carbon looking far more extensive.
+
 All layers are also masked (fully transparent) over tribal lands, using the dissolved polygon
 asset `projects/ee-jeli0026/assets/tribal-lands-mask-dissolved-23SEP2026`. The polygons are drawn
 as a thin dark-grey outline with transparent fill by a silent `tribal_outline` overlay — served
@@ -157,12 +161,14 @@ be added by editing `backend/layers.json`, without changing frontend code.
 
 ## Layer Configuration
 
-Map layers are configured in `backend/layers.json`. Three layer types are supported: `gee_image`
+Map layers are configured in `backend/layers.json`. Four layer types are supported: `gee_image`
 (a direct Earth Engine image asset — automatically masked to exclude NLCD open water,
-developed/impervious land, and barren/extractive land, plus nodata masking, valid min/max
-masking, value scaling/offset, and self-masking), `threshold_binary` (binarizes another
-configured layer), and `nlcd_water` (a standalone open-water reference layer, unaffected by the
-auto-masking). See `docs/architecture.md` for details.
+developed/impervious land, barren/extractive land, tribal lands, and everything outside the
+prediction domain, plus nodata masking, valid min/max masking, value scaling/offset,
+self-masking, and an optional `mask_layer` that clips it to another layer's footprint),
+`threshold_binary` (binarizes another configured layer), `nlcd_water` (a standalone open-water
+reference layer, unaffected by the NLCD auto-masking but still masked to tribal lands and the
+domain), and `tribal_outline` (the silent outline overlay). See `docs/architecture.md` for details.
 
 ## Deployment
 
