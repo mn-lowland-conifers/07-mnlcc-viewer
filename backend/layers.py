@@ -24,6 +24,10 @@ NLCD_EXCLUDED_CLASSES = (
 # drawn as a silent outline overlay (see "tribal_outline" layer type).
 TRIBAL_MASK_ASSET = "projects/ee-jeli0026/assets/tribal-lands-mask-dissolved-23SEP2026"
 
+# Prediction domain polygons: every data layer is masked to show data only
+# inside these polygons.
+DOMAIN_MASK_ASSET = "projects/ee-jeli0026/assets/mn-lowland-conifer-lta-mask-21OCT2026"
+
 
 def load_layers():
     with open(LAYER_FILE, "r") as f:
@@ -42,6 +46,7 @@ def _apply_common_transforms(img, cfg):
 
     img = img.updateMask(_nlcd_exclusion_mask())
     img = img.updateMask(_tribal_mask())
+    img = img.updateMask(_domain_mask())
 
     if "nodata_value" in cfg:
         nodata = cfg["nodata_value"]
@@ -98,6 +103,12 @@ def _tribal_mask():
     return ee.Image(0).byte().paint(_tribal_features(), 1).eq(0)
 
 
+def _domain_mask():
+    """Mask that is 1 inside the prediction-domain polygons and 0 everywhere else."""
+
+    return ee.Image(0).byte().paint(ee.FeatureCollection(DOMAIN_MASK_ASSET), 1)
+
+
 def get_layer_image(cfg):
     layer_type = cfg["type"]
 
@@ -132,6 +143,7 @@ def get_layer_image(cfg):
             .eq(NLCD_WATER_CLASS)
             .selfMask()
             .updateMask(_tribal_mask())
+            .updateMask(_domain_mask())
         )
 
     if layer_type == "tribal_outline":

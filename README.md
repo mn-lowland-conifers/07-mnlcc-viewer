@@ -57,6 +57,10 @@ as a thin dark-grey outline with transparent fill by a silent `tribal_outline` o
 via `GET /outlines`, not listed in `/layers`, so it has no legend entry, layer-control toggle, or
 click-query behavior.
 
+All layers are additionally clipped to the prediction domain: data is shown only inside the polygon
+asset `projects/ee-jeli0026/assets/mn-lowland-conifer-lta-mask-21OCT2026` and is fully transparent
+outside it. Like the tribal mask, this is unconditional (no toggle) and has no outline overlay.
+
 Color ramps for `prob_lgbm` and `depth` match Nic's preferred vis params from his trial GEE
 scripts (`probability_viewer.txt`, `depth_viewer.txt`, now in `x-example/`).
 

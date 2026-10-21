@@ -186,6 +186,12 @@ layer shows data inside the polygons. The `tribal_outline` layer type draws the 
 `FeatureCollection.style()` (dark grey, 1px, transparent fill). It is excluded from
 `public_layer_metadata()` and exposed only through `/outlines`.
 
+### Prediction domain mask
+
+`DOMAIN_MASK_ASSET` in `backend/layers.py` (prediction-domain polygons) is rasterized with
+`.paint()` by `_domain_mask()` and applied unconditionally in `_apply_common_transforms()` (and to
+`nlcd_water`), so every layer shows data only inside the polygons. There is no outline overlay.
+
 ### Reference overlay layers
 
 Two standalone, opt-in overlays, both `default_visible: false`:
