@@ -118,7 +118,20 @@ def get_layer_image(cfg):
         if "band" in cfg:
             img = img.select(cfg["band"])
 
-        return _apply_common_transforms(img, cfg)
+        img = _apply_common_transforms(img, cfg)
+
+        # Clip to another layer's footprint (e.g. peat_extent_mask). Evaluated
+        # at the map's zoom-level scale, so this layer appears and disappears
+        # exactly where the mask layer does when zoomed out.
+        if "mask_layer" in cfg:
+            mask_cfg = get_layer_config(cfg["mask_layer"])
+
+            if mask_cfg is None:
+                raise ValueError(f"Mask layer not found: {cfg['mask_layer']}")
+
+            img = img.updateMask(get_layer_image(mask_cfg))
+
+        return img
 
     if layer_type == "threshold_binary":
         source_layer_id = cfg["source_layer"]

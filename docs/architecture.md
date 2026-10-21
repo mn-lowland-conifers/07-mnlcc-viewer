@@ -192,6 +192,15 @@ layer shows data inside the polygons. The `tribal_outline` layer type draws the 
 `.paint()` by `_domain_mask()` and applied unconditionally in `_apply_common_transforms()` (and to
 `nlcd_water`), so every layer shows data only inside the polygons. There is no outline overlay.
 
+### `mask_layer`
+
+A `gee_image` layer with `"mask_layer": "<layer_id>"` is masked by that layer's image after its own
+transforms. `depth` and `carbon_belowground_fullstock` use `"mask_layer": "peat_extent_mask"`.
+Because Earth Engine evaluates the threshold at the tile's zoom-level scale (on the mean-pyramided
+`prob_lgbm`), this keeps both layers' footprint identical to the extent layer at every zoom. Without
+it, their own mean pyramids show any coarse pixel containing a single valid 30 m pixel, so they look
+far more extensive than the extent layer when zoomed out.
+
 ### Reference overlay layers
 
 Two standalone, opt-in overlays, both `default_visible: false`:
