@@ -66,3 +66,74 @@ html, body {
   border: 1px solid #777;
   margin-right: 6px;
 }
+
+/* Stacked legends (one per visible layer) */
+
+.legend-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.legend-stack .legend {
+  border-color: #ccc;
+}
+
+.legend-stack .legend.legend-active {
+  border-color: #333;
+}
+
+/* Disclaimer overlay */
+
+#disclaimer-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(60, 60, 60, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+#disclaimer-overlay[hidden] {
+  display: none;
+}
+
+.disclaimer-box {
+  background: white;
+  max-width: 480px;
+  padding: 20px 24px;
+  border-radius: 6px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  font-family: sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.disclaimer-box h2 {
+  margin-top: 0;
+  font-size: 20px;
+}
+
+.disclaimer-box a {
+  word-break: break-all;
+}
+
+#disclaimer-ok {
+  display: block;
+  margin: 16px 0 0 auto;
+  padding: 8px 28px;
+  font-size: 15px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background: #2e6da4;
+  color: white;
+}
+
+#disclaimer-ok:hover {
+  background: #245886;
+}

@@ -15,6 +15,22 @@
 <body>
   <div id="map"></div>
 
+  <!-- Disclaimer: shown on every page load; the map is unusable until OK. -->
+  <div id="disclaimer-overlay" role="dialog" aria-modal="true" aria-labelledby="disclaimer-title">
+    <div class="disclaimer-box">
+      <h2 id="disclaimer-title">Disclaimer</h2>
+      <p>
+        The maps in this viewer show model-produced values and are subject to error.
+        They should not be used as a substitute for field measurement.
+      </p>
+      <p>
+        Please see the MN Lowland Conifer Carbon project model documentation page at:<br>
+        <a id="disclaimer-doc-link" href="DOCUMENTATION_URL_TBD" target="_blank" rel="noopener">DOCUMENTATION_URL_TBD</a>
+      </p>
+      <button id="disclaimer-ok" type="button">OK</button>
+    </div>
+  </div>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>

@@ -3,7 +3,6 @@ const API_BASE = window.MNLCC_CONFIG.API_BASE;
 let layerMetadata = {};
 let activeLayerId = null;
 let activeGeeLayer = null;
-let legendControl = null;
 
 const geeLayers = {};
 const layerIdByLeafletId = new Map();
@@ -158,7 +157,7 @@ function setActiveLayer(layerId) {
   activeLayerId = layerId;
   activeGeeLayer = geeLayers[layerId];
 
-  addLegend(layerId);
+  renderLegends();
 
   const slider = document.getElementById("opacity-slider");
   if (slider && activeGeeLayer) {
@@ -187,83 +186,93 @@ map.on("overlayremove", function (e) {
     } else {
       activeLayerId = null;
       activeGeeLayer = null;
-
-      if (legendControl) {
-        map.removeControl(legendControl);
-        legendControl = null;
-      }
     }
   }
+
+  renderLegends();
 });
 
 // -----------------------------
 // Legend
 // -----------------------------
 
-function addLegend(layerId) {
-  if (legendControl) {
-    map.removeControl(legendControl);
-  }
+// One legend control listing every visible layer, in layer-list order. The
+// active layer (target of the opacity slider and click-to-query) is
+// highlighted.
 
+const legendControl = L.control({ position: "bottomright" });
+
+legendControl.onAdd = function () {
+  const div = L.DomUtil.create("div", "legend-stack");
+  L.DomEvent.disableClickPropagation(div);
+  L.DomEvent.disableScrollPropagation(div);
+  return div;
+};
+
+legendControl.addTo(map);
+
+function legendHtml(layerId) {
   const layer = layerMetadata[layerId];
+  const activeClass = layerId === activeLayerId ? " legend-active" : "";
 
-  if (!layer) {
-    return;
-  }
+  if (layer.legend_type === "categorical" && layer.classes?.length > 0) {
+    const rows = layer.classes
+      .map((cls) => {
+        return `
+          <div class="legend-row">
+            <span class="legend-swatch" style="background:#${cls.color};"></span>
+            <span>${cls.label}</span>
+          </div>
+        `;
+      })
+      .join("");
 
-  legendControl = L.control({ position: "bottomright" });
-
-  legendControl.onAdd = function () {
-    const div = L.DomUtil.create("div", "legend");
-
-    if (layer.legend_type === "categorical" && layer.classes?.length > 0) {
-      const rows = layer.classes
-        .map((cls) => {
-          return `
-            <div class="legend-row">
-              <span class="legend-swatch" style="background:#${cls.color};"></span>
-              <span>${cls.label}</span>
-            </div>
-          `;
-        })
-        .join("");
-
-      div.innerHTML = `
+    return `
+      <div class="legend${activeClass}">
         <div class="legend-title">${layer.name}</div>
         ${rows}
-      `;
+      </div>
+    `;
+  }
 
-      return div;
-    }
+  const vis = layer.vis;
+  const palette = vis.palette;
+  const unit = layer.unit || "";
 
-    const vis = layer.vis;
-    const palette = vis.palette;
-    const min = vis.min;
-    const max = vis.max;
-    const unit = layer.unit || "";
+  const gradient = palette
+    .map((color, index) => {
+      const pct = (index / (palette.length - 1)) * 100;
+      return `#${color} ${pct}%`;
+    })
+    .join(", ");
 
-    const gradient = palette
-      .map((color, index) => {
-        const pct = (index / (palette.length - 1)) * 100;
-        return `#${color} ${pct}%`;
-      })
-      .join(", ");
+  const maxLabel = layer.clamp_max ? `${vis.max}+` : `${vis.max}`;
 
-    const maxLabel = layer.clamp_max ? `${max}+` : `${max}`;
-
-    div.innerHTML = `
+  return `
+    <div class="legend${activeClass}">
       <div class="legend-title">${layer.name}</div>
       <div class="legend-gradient" style="background: linear-gradient(to right, ${gradient});"></div>
       <div class="legend-labels">
-        <span>${min}${unit}</span>
+        <span>${vis.min}${unit}</span>
         <span>${maxLabel}${unit}</span>
       </div>
-    `;
+    </div>
+  `;
+}
 
-    return div;
-  };
+function renderLegends() {
+  const container = legendControl.getContainer();
 
-  legendControl.addTo(map);
+  if (!container) {
+    return;
+  }
+
+  const visibleIds = Object.keys(layerMetadata).filter(
+    (layerId) => geeLayers[layerId] && map.hasLayer(geeLayers[layerId])
+  );
+
+  container.innerHTML = visibleIds.map(legendHtml).join("");
+  container.style.display = visibleIds.length > 0 ? "" : "none";
 }
 
 // -----------------------------
@@ -459,6 +468,20 @@ map.on("click", async function (e) {
     `);
   }
 });
+
+// -----------------------------
+// Disclaimer
+// -----------------------------
+
+const disclaimerOverlay = document.getElementById("disclaimer-overlay");
+const disclaimerOk = document.getElementById("disclaimer-ok");
+
+if (disclaimerOverlay && disclaimerOk) {
+  disclaimerOk.focus();
+  disclaimerOk.addEventListener("click", function () {
+    disclaimerOverlay.hidden = true;
+  });
+}
 
 // -----------------------------
 // Initialize app
