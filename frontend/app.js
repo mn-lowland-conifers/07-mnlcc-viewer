@@ -42,6 +42,11 @@ const baseMaps = {
 
 const overlayMaps = {};
 
+// Layers with "pane": "top" (e.g. the landcover mask) draw above all data
+// layers (tilePane, z 200) but below the tribal outlines (z 250).
+map.createPane("top");
+map.getPane("top").style.zIndex = 240;
+
 const layerControl = L.control.layers(baseMaps, overlayMaps, {
   collapsed: false
 }).addTo(map);
@@ -100,10 +105,16 @@ async function registerGeeLayer(layerId) {
 
   const opacity = layer.opacity ?? 0.75;
 
-  const geeLayer = L.tileLayer(data.tile_url, {
+  const tileOptions = {
     opacity: opacity,
     attribution: "Google Earth Engine"
-  });
+  };
+
+  if (layer.pane) {
+    tileOptions.pane = layer.pane;
+  }
+
+  const geeLayer = L.tileLayer(data.tile_url, tileOptions);
 
   geeLayers[layerId] = geeLayer;
 
@@ -363,6 +374,20 @@ function formatQueriedValue(rawValue, layer, unit) {
   }
 
   const numericValue = Number(rawValue);
+
+  // Binned layers (e.g. depth): the query returns the raw value, so show it
+  // along with the bin it falls in.
+  const isBinned = layer.classes?.some((cls) => cls.min !== undefined);
+
+  if (isBinned && Number.isFinite(numericValue)) {
+    const bin = layer.classes.find(
+      (cls) =>
+        numericValue >= cls.min &&
+        (cls.max === undefined || numericValue < cls.max)
+    );
+    const text = `${numericValue.toFixed(1)}${unit}`;
+    return bin ? `${text} (${bin.label})` : text;
+  }
 
   if (layer.legend_type === "categorical") {
     const match = layer.classes?.find(

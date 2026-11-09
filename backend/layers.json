@@ -1,4 +1,49 @@
 {
+  "landcover_mask": {
+    "name": "Land Cover Mask v1 (09NOV2026)",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/landcover-mask-v1-09NOV2026",
+    "skip_landcover_mask": true,
+    "self_mask": true,
+    "pane": "top",
+    "scale": 30,
+    "unit": "",
+    "legend_type": "categorical",
+    "default_visible": true,
+    "opacity": 0.85,
+    "vis": {
+      "min": 1,
+      "max": 4,
+      "palette": [
+        "4682b4",
+        "404040",
+        "ff00ff",
+        "2e8b57"
+      ]
+    },
+    "classes": [
+      {
+        "value": 1,
+        "label": "Water",
+        "color": "4682b4"
+      },
+      {
+        "value": 2,
+        "label": "Urban / developed",
+        "color": "404040"
+      },
+      {
+        "value": 3,
+        "label": "Mining / extraction",
+        "color": "ff00ff"
+      },
+      {
+        "value": 4,
+        "label": "Agriculture (cropland / pasture)",
+        "color": "2e8b57"
+      }
+    ]
+  },
   "prob_lgbm": {
     "name": "Peatland Probability (LGBM) MNLCCv1-0_16SEP2026",
     "type": "gee_image",
@@ -16,12 +61,19 @@
       "min": 0,
       "max": 99.5,
       "palette": [
-        "000000", "2b0000", "660000", "990000", "cc0000",
-        "e63900", "ff6600", "ff9900", "ffcc00", "ffff99"
+        "000000",
+        "2b0000",
+        "660000",
+        "990000",
+        "cc0000",
+        "e63900",
+        "ff6600",
+        "ff9900",
+        "ffcc00",
+        "ffff99"
       ]
     }
   },
-
   "comp_fibric": {
     "enabled": false,
     "name": "Peat Composition — Fibric % MNLCCv1-0_16SEP2026",
@@ -38,12 +90,18 @@
       "min": 0,
       "max": 100,
       "palette": [
-        "fff7ec", "fee8c8", "fdd49e", "fdbb84", "fc8d59",
-        "ef6548", "d7301f", "b30000", "7f0000"
+        "fff7ec",
+        "fee8c8",
+        "fdd49e",
+        "fdbb84",
+        "fc8d59",
+        "ef6548",
+        "d7301f",
+        "b30000",
+        "7f0000"
       ]
     }
   },
-
   "comp_hemic": {
     "enabled": false,
     "name": "Peat Composition — Hemic % MNLCCv1-0_16SEP2026",
@@ -60,12 +118,18 @@
       "min": 0,
       "max": 100,
       "palette": [
-        "ffffe5", "fff7bc", "fee391", "fec44f", "fe9929",
-        "ec7014", "cc4c02", "993404", "662506"
+        "ffffe5",
+        "fff7bc",
+        "fee391",
+        "fec44f",
+        "fe9929",
+        "ec7014",
+        "cc4c02",
+        "993404",
+        "662506"
       ]
     }
   },
-
   "comp_sapric": {
     "enabled": false,
     "name": "Peat Composition — Sapric % MNLCCv1-0_16SEP2026",
@@ -82,12 +146,17 @@
       "min": 0,
       "max": 100,
       "palette": [
-        "f7f7f7", "d9d9d9", "bdbdbd", "969696", "737373",
-        "525252", "252525", "000000"
+        "f7f7f7",
+        "d9d9d9",
+        "bdbdbd",
+        "969696",
+        "737373",
+        "525252",
+        "252525",
+        "000000"
       ]
     }
   },
-
   "comp_mineral": {
     "enabled": false,
     "name": "Peat Composition — Mineral % MNLCCv1-0_16SEP2026",
@@ -104,12 +173,18 @@
       "min": 0,
       "max": 100,
       "palette": [
-        "fcfbfd", "efedf5", "dadaeb", "bcbddc", "9e9ac8",
-        "807dba", "6a51a3", "54278f", "3f007d"
+        "fcfbfd",
+        "efedf5",
+        "dadaeb",
+        "bcbddc",
+        "9e9ac8",
+        "807dba",
+        "6a51a3",
+        "54278f",
+        "3f007d"
       ]
     }
   },
-
   "depth": {
     "name": "Predicted Peat Depth MNLCCv1-0_16SEP2026",
     "type": "gee_image",
@@ -118,20 +193,55 @@
     "scale": 30,
     "unit": " cm",
     "nodata_value": 65535,
-    "legend_type": "continuous",
-    "clamp_max": true,
+    "legend_type": "categorical",
     "default_visible": false,
     "opacity": 0.75,
     "vis": {
-      "min": 6,
-      "max": 456,
+      "min": 1,
+      "max": 4,
       "palette": [
-        "000000", "2b0000", "660000", "990000", "cc0000",
-        "e63900", "ff6600", "ff9900", "ffcc00", "ffff99"
+        "660000",
+        "cc0000",
+        "ff6600",
+        "ffcc00"
       ]
-    }
+    },
+    "bins": [
+      40,
+      100,
+      200,
+      300
+    ],
+    "classes": [
+      {
+        "value": 1,
+        "label": "40–100 cm",
+        "color": "660000",
+        "min": 40,
+        "max": 100
+      },
+      {
+        "value": 2,
+        "label": "100–200 cm",
+        "color": "cc0000",
+        "min": 100,
+        "max": 200
+      },
+      {
+        "value": 3,
+        "label": "200–300 cm",
+        "color": "ff6600",
+        "min": 200,
+        "max": 300
+      },
+      {
+        "value": 4,
+        "label": "300+ cm",
+        "color": "ffcc00",
+        "min": 300
+      }
+    ]
   },
-
   "peat_extent_mask": {
     "name": "Predicted Peat Extent (≥36.2% probability) MNLCCv1-0_16SEP2026",
     "type": "threshold_binary",
@@ -145,13 +255,18 @@
     "vis": {
       "min": 1,
       "max": 1,
-      "palette": ["ff6600"]
+      "palette": [
+        "ff6600"
+      ]
     },
     "classes": [
-      {"value": 1, "label": "Present", "color": "ff6600"}
+      {
+        "value": 1,
+        "label": "Present",
+        "color": "ff6600"
+      }
     ]
   },
-
   "water_mask": {
     "enabled": false,
     "name": "NLCD Open Water MNLCCv1-0_16SEP2026",
@@ -164,13 +279,18 @@
     "vis": {
       "min": 1,
       "max": 1,
-      "palette": ["000000"]
+      "palette": [
+        "000000"
+      ]
     },
     "classes": [
-      {"value": 1, "label": "Open water", "color": "000000"}
+      {
+        "value": 1,
+        "label": "Open water",
+        "color": "000000"
+      }
     ]
   },
-
   "carbon_belowground_fullstock": {
     "name": "Belowground Carbon Stock (Full Profile) MNLCCv1-0_16SEP2026",
     "type": "gee_image",
@@ -187,14 +307,65 @@
       "min": 45,
       "max": 130,
       "palette": [
-        "440154", "481567", "482677", "453581", "404688",
-        "39568c", "33638d", "2d708e", "287c8e", "23888e",
-        "1f968b", "20a387", "29af7f", "3cbb75", "55c667",
-        "73d055", "95d840", "b8de29", "dce319", "fde725"
+        "440154",
+        "481567",
+        "482677",
+        "453581",
+        "404688",
+        "39568c",
+        "33638d",
+        "2d708e",
+        "287c8e",
+        "23888e",
+        "1f968b",
+        "20a387",
+        "29af7f",
+        "3cbb75",
+        "55c667",
+        "73d055",
+        "95d840",
+        "b8de29",
+        "dce319",
+        "fde725"
       ]
     }
   },
-
+  "ssurgo_histosol_pct": {
+    "name": "gSSURGO Histosol (percent of map unit)",
+    "type": "gee_image",
+    "asset": "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/ssurgo_histosol_pct",
+    "scale": 30,
+    "unit": "%",
+    "legend_type": "continuous",
+    "default_visible": false,
+    "opacity": 0.75,
+    "vis": {
+      "min": 0,
+      "max": 100,
+      "palette": [
+        "440154",
+        "481567",
+        "482677",
+        "453581",
+        "404688",
+        "39568c",
+        "33638d",
+        "2d708e",
+        "287c8e",
+        "23888e",
+        "1f968b",
+        "20a387",
+        "29af7f",
+        "3cbb75",
+        "55c667",
+        "73d055",
+        "95d840",
+        "b8de29",
+        "dce319",
+        "fde725"
+      ]
+    }
+  },
   "tribal_outline": {
     "name": "Tribal lands outline",
     "type": "tribal_outline",

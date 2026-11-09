@@ -30,11 +30,16 @@ assets under `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/` (all `C
 
 Active (shown in the app):
 
+- Land Cover Mask v1 (09NOV2026) — `landcover_mask`, listed first, on by default, drawn above
+  all data layers: 1 water (steel blue), 2 urban/developed (dark grey), 3 mining/extraction
+  (magenta), 4 agriculture (sea green); 0 is transparent. Not self-masked (`skip_landcover_mask`).
 - Peatland Probability (LGBM) — `prob_lgbm`
-- Predicted Peat Depth — `depth`
+- Predicted Peat Depth — `depth`, shown in 4 bins (`bins` in `layers.json`): 40–100, 100–200,
+  200–300, 300+ cm; < 40 cm is transparent. Click-query still returns the raw depth.
 - Predicted Peat Extent (≥36.2% probability) — `peat_extent_mask`, a toggleable reference overlay
   derived from `prob_lgbm`
 - Belowground Carbon Stock (Full Profile) — `carbon_belowground_fullstock` (viridis palette)
+- gSSURGO Histosol (percent of map unit) — `ssurgo_histosol_pct` (viridis, 0–100 %)
 
 Defined but currently disabled (`"enabled": false` in `layers.json` — configs kept for later
 reactivation, not deleted):
@@ -45,10 +50,10 @@ reactivation, not deleted):
 
 Every layer's display name has `MNLCCv1-0_16SEP2026` appended (product version tag).
 
-All 7 raw layers are automatically masked to exclude USGS NLCD 2021 open water,
-developed/impervious land, and barren/extractive land (strip mines, gravel pits, quarries — e.g.
-the Mesabi Iron Range open pits), fully transparent rather than a solid color. This is
-unconditional, not a toggle. `peat_extent_mask` and `water_mask` above are separate opt-in
+All raw data layers are automatically masked wherever the project landcover mask
+(`landcover-mask-v1-09NOV2026`) is water (1), urban/developed (2) or mining/extraction (3), fully
+transparent rather than a solid color. Agriculture (4) is deliberately *not* masked. This is
+unconditional, not a toggle, and replaced the earlier USGS NLCD 2021 exclusion (09NOV2026). `peat_extent_mask` and `water_mask` above are separate opt-in
 reference overlays for showing predicted extent / water boundaries explicitly.
 
 `depth` and `carbon_belowground_fullstock` are clipped to `peat_extent_mask` at every zoom, and
@@ -162,12 +167,12 @@ be added by editing `backend/layers.json`, without changing frontend code.
 ## Layer Configuration
 
 Map layers are configured in `backend/layers.json`. Four layer types are supported: `gee_image`
-(a direct Earth Engine image asset — automatically masked to exclude NLCD open water,
-developed/impervious land, barren/extractive land, tribal lands, and everything outside the
+(a direct Earth Engine image asset — automatically masked to exclude landcover-mask water,
+urban/developed and mining/extraction pixels, tribal lands, and everything outside the
 prediction domain, plus nodata masking, valid min/max masking, value scaling/offset,
 self-masking, and an optional `mask_layer` that clips it to another layer's footprint),
 `threshold_binary` (binarizes another configured layer), `nlcd_water` (a standalone open-water
-reference layer, unaffected by the NLCD auto-masking but still masked to tribal lands and the
+reference layer, unaffected by the landcover auto-masking but still masked to tribal lands and the
 domain), and `tribal_outline` (the silent outline overlay). See `docs/architecture.md` for details.
 
 ## Deployment

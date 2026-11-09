@@ -107,7 +107,7 @@ def value(layer_id: str, lat: float, lon: float):
         raise HTTPException(status_code=404, detail="Layer not found")
 
     try:
-        img = get_layer_image(cfg)
+        img = get_layer_image(cfg, classify=False)
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
 

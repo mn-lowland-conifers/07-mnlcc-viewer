@@ -6,19 +6,20 @@ import ee
 
 LAYER_FILE = Path(__file__).parent / "layers.json"
 
-# Used to auto-mask every gee_image layer (open water + developed/impervious +
-# barren/extractive), by threshold_binary layers with "exclude_nlcd_water":
-# true, and by the "nlcd_water" layer type.
+# Project landcover mask (also shown as the "landcover_mask" layer). Classes:
+# 0 none, 1 water, 2 urban/developed, 3 mining/extraction, 4 agriculture.
+# Every gee_image layer is auto-masked where it is 1-3; agriculture (4) is
+# deliberately left visible.
+LANDCOVER_MASK_ASSET = (
+    "projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/"
+    "landcover-mask-v1-09NOV2026"
+)
+LANDCOVER_EXCLUDED_CLASSES = [1, 2, 3]
+
+# Only used by the (disabled) "nlcd_water" reference layer type.
 NLCD_COLLECTION = "USGS/NLCD_RELEASES/2021_REL/NLCD"
 NLCD_YEAR = "2021"
 NLCD_WATER_CLASS = 11
-# Developed, Open Space / Low / Medium / High Intensity.
-NLCD_DEVELOPED_CLASSES = [21, 22, 23, 24]
-# Barren Land (Rock/Sand/Clay) - includes strip mines, gravel pits, quarries.
-NLCD_BARREN_CLASS = 31
-NLCD_EXCLUDED_CLASSES = (
-    [NLCD_WATER_CLASS] + NLCD_DEVELOPED_CLASSES + [NLCD_BARREN_CLASS]
-)
 
 # Polygons (dissolved tribal lands) that are masked out of every data layer and
 # drawn as a silent outline overlay (see "tribal_outline" layer type).
@@ -44,7 +45,11 @@ def get_layer_config(layer_id: str):
 def _apply_common_transforms(img, cfg):
     """Apply common masking and scaling operations to a GEE image."""
 
-    img = img.updateMask(_nlcd_exclusion_mask())
+    # Layers that themselves depict water/developed/mining (e.g. the
+    # landcover mask) must not have those classes masked out.
+    if not cfg.get("skip_landcover_mask", False):
+        img = img.updateMask(_landcover_exclusion_mask())
+
     img = img.updateMask(_tribal_mask())
     img = img.updateMask(_domain_mask())
 
@@ -81,13 +86,15 @@ def _nlcd_landcover():
     )
 
 
-def _nlcd_exclusion_mask():
-    """Mask out USGS NLCD open water + developed/impervious pixels."""
+def _landcover_exclusion_mask():
+    """Mask out water, urban/developed and mining/extraction pixels of the
+    project landcover mask (agriculture stays visible). Pixels where the
+    asset has no data count as class 0, i.e. are kept."""
 
-    landcover = _nlcd_landcover()
-    mask = landcover.neq(NLCD_EXCLUDED_CLASSES[0])
+    landcover = ee.Image(LANDCOVER_MASK_ASSET).unmask(0)
+    mask = landcover.neq(LANDCOVER_EXCLUDED_CLASSES[0])
 
-    for cls in NLCD_EXCLUDED_CLASSES[1:]:
+    for cls in LANDCOVER_EXCLUDED_CLASSES[1:]:
         mask = mask.And(landcover.neq(cls))
 
     return mask
@@ -109,7 +116,10 @@ def _domain_mask():
     return ee.Image(0).byte().paint(ee.FeatureCollection(DOMAIN_MASK_ASSET), 1)
 
 
-def get_layer_image(cfg, apply_mask_layer=True):
+def get_layer_image(cfg, apply_mask_layer=True, classify=True):
+    """classify=False returns raw values for binned layers (used by
+    click-to-query, so the popup shows e.g. the actual depth)."""
+
     layer_type = cfg["type"]
 
     if layer_type == "gee_image":
@@ -140,6 +150,18 @@ def get_layer_image(cfg, apply_mask_layer=True):
 
             img = img.updateMask(mask)
 
+        # Bin continuous values into classes 1..N: values below the first
+        # edge are hidden; class k covers [bins[k-1], bins[k]).
+        if "bins" in cfg:
+            bins = cfg["bins"]
+            img = img.updateMask(img.gte(bins[0]))
+
+            if classify:
+                classes = img.gte(bins[0])
+                for edge in bins[1:]:
+                    classes = classes.add(img.gte(edge))
+                img = classes
+
         return img
 
     if layer_type == "threshold_binary":
@@ -156,8 +178,8 @@ def get_layer_image(cfg, apply_mask_layer=True):
         threshold = cfg["threshold"]
         img = source_img.gte(threshold).selfMask()
 
-        if cfg.get("exclude_nlcd_water", False):
-            img = img.updateMask(_nlcd_exclusion_mask())
+        if cfg.get("exclude_landcover_mask", False):
+            img = img.updateMask(_landcover_exclusion_mask())
 
         return img
 
@@ -192,6 +214,7 @@ def public_layer_metadata():
             "clamp_max": cfg.get("clamp_max", False),
             "default_visible": cfg.get("default_visible", False),
             "opacity": cfg.get("opacity", 0.75),
+            "pane": cfg.get("pane"),
         }
         for layer_id, cfg in LAYERS.items()
         if cfg.get("enabled", True) and cfg["type"] != "tribal_outline"

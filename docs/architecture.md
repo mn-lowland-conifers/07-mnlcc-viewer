@@ -136,19 +136,19 @@ A direct Earth Engine image asset. The seven raw MNLCC layers (probability, four
 percentages, depth, carbon stock) are single-band ingested assets under
 `projects/ee-jeli0026/assets/mn_lowland_conifer_v20260916/`, all using this type.
 
-Every `gee_image` layer is **automatically masked** to exclude USGS NLCD 2021 open water (class
-11), developed/impervious land (classes 21-24, Open Space through High Intensity), and barren
-land (class 31 — includes strip mines, gravel pits, and quarries, e.g. the Mesabi Iron Range open
-pits) — `_apply_common_transforms()` in `backend/layers.py` applies `_nlcd_exclusion_mask()`
-unconditionally, before any other transform. Masked pixels render fully transparent (not a solid
-color), so basemap/imagery shows through. This is unconditional for every `gee_image` layer; there
-is currently no per-layer opt-out. Note class 31 also covers non-mining barren land (natural rock
-outcrops, beaches); NLCD has no separate "extractive" class, so this is the standard tradeoff for
-masking mining areas.
+Every `gee_image` layer is **automatically masked** using the project landcover mask
+(`LANDCOVER_MASK_ASSET` = `.../landcover-mask-v1-09NOV2026`): pixels of class 1 (water), 2
+(urban/developed) or 3 (mining/extraction) are hidden; class 4 (agriculture — cropland/pasture) is
+deliberately kept, as is class 0 and anywhere the asset has no data (`unmask(0)`).
+`_apply_common_transforms()` in `backend/layers.py` applies `_landcover_exclusion_mask()` before any
+other transform. Masked pixels render fully transparent (not a solid color), so basemap/imagery
+shows through. The per-layer opt-out `skip_landcover_mask: true` is used only by the
+`landcover_mask` display layer itself. (This replaced the earlier USGS NLCD 2021 water / developed
+/ barren exclusion on 2026-11-09.)
 
 Supported transformations (`_apply_common_transforms` in `backend/layers.py`):
 
-- NLCD water + developed + barren/extractive exclusion (see above; always applied)
+- Landcover-mask water + urban + mining exclusion (see above; agriculture kept)
 - `nodata_value` — exact-value mask (255 for the uint8 layers, 65535 for the uint16 layers)
 - `valid_min` / `valid_max` — inequality mask
 - `value_multiplier` / `value_offset` — rescale raw stored values to public units
@@ -162,7 +162,7 @@ Binarizes another *configured* layer (via `source_layer` + `threshold`, compared
 i.e. in the same units as the source layer's public values — e.g. percent, not raw 0-200).
 Ported from askdb-viewer's pattern; the one current use is `peat_extent_mask` (see below).
 
-Optional `exclude_nlcd_water: true` additionally applies `_nlcd_exclusion_mask()` directly (on
+Optional `exclude_landcover_mask: true` additionally applies `_landcover_exclusion_mask()` directly (on
 top of whatever the source layer already applied). Redundant for any `threshold_binary` whose
 source is a `gee_image` layer (already auto-masked — see above), but kept as an explicit option
 for robustness if a future source layer type isn't auto-masked.
@@ -213,7 +213,7 @@ still show every probability. Since `peat_extent_mask` is derived from `prob_lgb
 Two standalone, opt-in overlays, both `default_visible: false`:
 
 - `peat_extent_mask` — `threshold_binary` on `prob_lgbm` at 36.2%, the ≥0.362 probability cutoff
-  from Nic's trial GEE scripts. (No longer needs its own `exclude_nlcd_water` — inherited from
+  from Nic's trial GEE scripts. (No longer needs its own `exclude_landcover_mask` — inherited from
   `prob_lgbm`'s auto-mask.)
 - `water_mask` — `nlcd_water`, shown as a black reference layer, matching the "NLCD Open Water"
   toggle in Nic's trial scripts.
